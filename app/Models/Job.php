@@ -7,10 +7,12 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Support\Str;
 
 class Job extends Model
 {
     protected $table = 'job_openings';
+
     protected $fillable = [
         'title',
         'department_id',
@@ -26,6 +28,7 @@ class Job extends Model
         'long_description',
         'job_requirements',
         'benefits',
+        'slug',
     ];
 
     protected $casts = [
@@ -84,5 +87,37 @@ class Job extends Model
             'senior' => 'Senior',
             'lead' => 'Lead',
         ];
+    }
+
+    protected static function booted(): void
+    {
+        static::creating(function (Job $model) {
+            if (empty($model->slug) && !empty($model->title)) {
+                $base = Str::slug($model->title);
+                $slug = $base;
+                $i = 1;
+                while (self::query()->where('slug', $slug)->exists()) {
+                    $slug = $base . '-' . $i++;
+                }
+                $model->slug = $slug;
+            }
+        });
+
+        static::updating(function (Job $model) {
+            // If title changed and slug wasn't explicitly modified, regenerate slug
+            if ($model->isDirty('title') && !$model->isDirty('slug')) {
+                $base = Str::slug($model->title);
+                $slug = $base;
+                $i = 1;
+                while (self::query()
+                    ->where('slug', $slug)
+                    ->where('id', '<>', $model->getKey())
+                    ->exists()
+                ) {
+                    $slug = $base . '-' . $i++;
+                }
+                $model->slug = $slug;
+            }
+        });
     }
 }

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CareerController;
 use App\Http\Controllers\SetupController;
 use App\Http\Controllers\EmployeePasswordSetupController;
 use Illuminate\Support\Facades\Route;
@@ -14,3 +15,10 @@ Route::post('/employee/setup-password/{token}', [EmployeePasswordSetupController
 Route::get('/', function () {
     return view('welcome');
 });
+
+// dynamic route for company-name
+Route::get('/careers', [CareerController::class, 'index'])->name('jobs.index');
+// dynamic route for each career
+Route::get('/careers/{slug}', [CareerController::class, 'show'])->name('jobs.show');
+// route for job application submission
+Route::post('/careers/{slug}/apply', [CareerController::class, 'apply'])->name('job.apply');

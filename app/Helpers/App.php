@@ -8,7 +8,24 @@ use Illuminate\Support\Facades\Schema;
 if (!function_exists('get_setting')) {
     function get_setting(string $key, $default = null)
     {
-        return null;
+        if (!Schema::hasTable('settings')) {
+            return $default;
+        }
+
+        $setting = Setting::where('key', $key)->first();
+
+        if (!$setting) {
+            return $default;
+        }
+
+        // Check if this setting is a file upload
+        if ($setting->type === 'file' && $setting->media_collection_name) {
+            // Get the first media item from the collection (using the key as collection name)
+            $media = $setting->getFirstMedia($setting->media_collection_name ?? 'default');
+            return $media ? $media->getUrl() : $default;
+        }
+
+        return $setting->value;
     }
 }
 

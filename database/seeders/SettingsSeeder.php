@@ -15,63 +15,18 @@ class SettingsSeeder extends Seeder
         $settings = [
             [
                 'group' => 'Identity',
-                'name' => 'Brand Name',
-                'key' => 'brand_name',
-                'value' => 'Congora',
+                'name' => 'Company Name',
+                'key' => 'company_name',
+                'value' => 'HRM',
                 'type' => 'text'
             ],
             [
-                'group' => 'Force Update',
-                'name' => 'iOS Minimum Version',
-                'key' => 'ios_min_version',
-                'value' => '1.0.0',
-                'type' => 'text'
-            ],
-            [
-                'group' => 'Force Update',
-                'name' => 'Android Minimum Version',
-                'key' => 'android_min_version',
-                'value' => '1.0.0',
-                'type' => 'text'
-            ],
-            [
-                'group' => 'Maintenance',
-                'name' => 'Maintenance Mode',
-                'key' => 'maintenance_mode',
-                'value' => 0,
-                'is_configurable_by_admin' => true,
-                'type' => 'boolean',
-            ],
-            [
-                'group' => 'Login Options',
-                'name' => 'Login by Apple',
-                'key' => 'login_by_apple',
-                'value' => 0,
-                'type' => 'boolean',
-            ],
-            [
-                'group' => 'Login Options',
-                'name' => 'Login by Google',
-                'key' => 'login_by_google',
-                'value' => 0,
-                'type' => 'boolean',
-            ],
-            [
-                'group' => 'Color Identity',
+                'group' => 'careers',
                 'name' => 'Primary Color',
                 'key' => 'primary_color',
                 'value' => '#23B53D',
                 'type' => 'color',
             ],
-            [
-                'group' => 'Color Identity',
-                'name' => 'Secondary Color',
-                'key' => 'secondary_color',
-                'value' => '#000000',
-                'type' => 'color',
-            ],
-
-            // logos: light and dark
             [
                 'group' => 'Logos',
                 'name' => 'Logo Light',
@@ -88,24 +43,6 @@ class SettingsSeeder extends Seeder
                 'value' => null,
                 'is_configurable_by_admin' => true,
                 'media_collection_name' => 'logo_dark',
-                'type' => 'file',
-            ],
-            [
-                'group' => 'Logos',
-                'key' => 'logo_icon_light',
-                'name' => 'Logo Icon Light',
-                'value' => null,
-                'is_configurable_by_admin' => true,
-                'media_collection_name' => 'logo_icon_light',
-                'type' => 'file',
-            ],
-            [
-                'group' => 'Logos',
-                'name' => 'Logo Icon Dark',
-                'key' => 'logo_icon_dark',
-                'value' => null,
-                'is_configurable_by_admin' => true,
-                'media_collection_name' => 'logo_icon_dark',
                 'type' => 'file',
             ],
         ];
