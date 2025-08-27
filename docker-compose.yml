@@ -6,7 +6,7 @@ services:
         build:
             context: . # that's means the Dockerfile in the same directory of the docker-compose.yml
             dockerfile: ./docker/php/Dockerfile
-        container_name: ${APP_NAME:-Canitude}_app
+        container_name: ${APP_NAME:-filament_hrm}_app
         # This option will restart the container if it stops for any reason other than the user explicitly stopping it using (docker stop app).
         # The default is no, which means that the container will not automatically restart in the event of a failure.
         # Available options are on-failure, always, unless-stopped, and no .
@@ -37,7 +37,7 @@ services:
         build:
             context: .
             dockerfile: ./docker/nginx/Dockerfile
-        container_name: ${APP_NAME:-Canitude}_webserver
+        container_name: ${APP_NAME:-filament_hrm}_webserver
         # restart: unless-stopped
         volumes:
             - ./:/var/www
@@ -55,7 +55,7 @@ services:
     # MySQL Service
     mysql:
         image: mysql:8.0
-        container_name: ${APP_NAME:-Canitude}_mysql
+        container_name: ${APP_NAME:-filament_hrm}_mysql
         # restart: unless-stopped
         environment:
           MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
@@ -70,7 +70,7 @@ services:
     # PHPMyAdmin Service
     phpmyadmin:
         image: phpmyadmin/phpmyadmin
-        container_name: ${APP_NAME:-Canitude}_phpmyadmin
+        container_name: ${APP_NAME:-filament_hrm}_phpmyadmin
         restart: unless-stopped
         environment:
             PMA_HOST: mysql
@@ -88,7 +88,7 @@ services:
     # Mailpit Service
     mailpit:
         image: axllent/mailpit
-        container_name: ${APP_NAME:-Canitude}_mailpit
+        container_name: ${APP_NAME:-filament_hrm}_mailpit
         restart: unless-stopped
         ports:
             - "8082:8025"

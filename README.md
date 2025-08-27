@@ -1,6 +1,6 @@
 <div align="center">
 
-# Canitude
+# Filament HRM
 
 This is the base Laravel core prepared for internal projects at **IntCore**. It includes preconfigured modules like Admin Panel, Dashboard, User Roles & Permissions, Notification Center, Static Pages, and common APIs.
 
@@ -13,7 +13,7 @@ This is the base Laravel core prepared for internal projects at **IntCore**. It 
 ### 1️⃣ Clone the Repository
 
 ```bash
-git clone https://github.com/intcore-company/canitude-backend
+git clone https://github.com/hazem-hammad/filament-hrm.git
 ```
 
 ### 2️⃣ Build and Start Docker Containers
@@ -69,56 +69,61 @@ Check if all containers are running:
 ---
 
 ## 📦 Modules Included
+
 **Dashboard**
-- Install Filament
-- Admin Module
-- User Module
-- Static Pages Module
-- Roles and Permissions Module
-- Faq Module
-- Notification Center Module
-- Slider Module
+
+-   Install Filament
+-   Admin Module
+-   User Module
+-   Static Pages Module
+-   Roles and Permissions Module
+-   Faq Module
+-   Notification Center Module
+-   Slider Module
 
 **APIs**
-- Get Configurations
-- Device Token
-- Upload Files
-- Auth
-- Register
-- Login (Phone, Password)
-- Social Login
-- Reset Password
-- Send OTP
--  Verify OTP
-- Logout
-- Get Profile
-- Update Profile
-- Change Password
-- Change Phone
-- Notifications
-- Get FAQ
-- Static Pages
-- Get Sliders
-- Delete Account
+
+-   Get Configurations
+-   Device Token
+-   Upload Files
+-   Auth
+-   Register
+-   Login (Phone, Password)
+-   Social Login
+-   Reset Password
+-   Send OTP
+-   Verify OTP
+-   Logout
+-   Get Profile
+-   Update Profile
+-   Change Password
+-   Change Phone
+-   Notifications
+-   Get FAQ
+-   Static Pages
+-   Get Sliders
+-   Delete Account
 
 **Code**
-- Custom Logging
-- Custom Cache Helpers
-- FCM Helpers
-- Filters by Pipeline
-- Payments (Just use gateway class and enjoy)
-- Payfort Gateway
-- MyFatoorah Gateway
-- Activity Logs
+
+-   Custom Logging
+-   Custom Cache Helpers
+-   FCM Helpers
+-   Filters by Pipeline
+-   Payments (Just use gateway class and enjoy)
+-   Payfort Gateway
+-   MyFatoorah Gateway
+-   Activity Logs
 
 **Packages**
-- Filament
-- Filament Google Map
-- Spatie Media Library
-- Spatie Activity Logs
-- Filament Shield (roles and permissions)
-- Laravel Notification Channels (fcm as a driver)
-- Telescope
-- Sanctum
+
+-   Filament
+-   Filament Google Map
+-   Spatie Media Library
+-   Spatie Activity Logs
+-   Filament Shield (roles and permissions)
+-   Laravel Notification Channels (fcm as a driver)
+-   Telescope
+-   Sanctum
 
 ## 🎉 Enjoy and Happy Coding! 🚀🔥
