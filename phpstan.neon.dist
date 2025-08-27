@@ -1,0 +1,15 @@
+includes:
+  - vendor/larastan/larastan/extension.neon
+  - vendor/nesbot/carbon/extension.neon
+
+parameters:
+  paths:
+    - app/
+    - routes/
+    - database/seeders/
+  level: 6
+  memoryLimit: 1G
+  tmpDir: storage/phpstan
+  excludePaths:
+    - bootstrap/cache/*
+    - database/migrations/*

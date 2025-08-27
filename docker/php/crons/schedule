@@ -1,0 +1,4 @@
+SHELL=/bin/bash
+# START CRON JOB LIST
+* * * * * root cd /var/www && /usr/local/bin/php artisan schedule:run> /dev/null 2> /var/www/storage/logs/crontab.log
+# END CRON JOB LIST
