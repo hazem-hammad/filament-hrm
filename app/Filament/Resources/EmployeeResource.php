@@ -68,10 +68,10 @@ class EmployeeResource extends Resource
                                     ->label('Password')
                                     ->placeholder('Enter employee password')
                                     ->password()
-                                    ->required(fn (string $operation): bool => $operation === 'create')
+                                    ->required(fn(string $operation): bool => $operation === 'create')
                                     ->maxLength(255)
                                     ->revealable()
-                                    ->dehydrated(fn ($state) => filled($state))
+                                    ->dehydrated(fn($state) => filled($state))
                                     ->helperText('Leave empty to keep current password (edit only)'),
                                 Forms\Components\Textarea::make('address')
                                     ->label('Address')
@@ -90,6 +90,7 @@ class EmployeeResource extends Resource
                                     ->required()
                                     ->maxLength(255)
                                     ->disabled()
+                                    ->columnSpanFull()
                                     ->dehydrated(),
                                 Forms\Components\Select::make('department_id')
                                     ->label('Select Department')
@@ -170,10 +171,10 @@ class EmployeeResource extends Resource
     protected static function getDocumentFields(): array
     {
         $fields = [];
-        
+
         // Get all document types
         $documentTypes = DocumentType::query()->active()->get();
-        
+
         foreach ($documentTypes as $documentType) {
             $field = SpatieMediaLibraryFileUpload::make($documentType->name)
                 ->label($documentType->name)
@@ -188,32 +189,16 @@ class EmployeeResource extends Resource
                 ->previewable()
                 ->reorderable()
                 ->columnSpan(1);
-            
+
             if ($documentType->is_required) {
                 $field->required()->maxFiles(1);
             } else {
                 $field->maxFiles(3);
             }
-            
+
             $fields[] = $field;
         }
-        
-        // Add a general documents upload field
-        $fields[] = SpatieMediaLibraryFileUpload::make('other_documents')
-            ->label('Other Documents')
-            ->collection('other_documents')
-            ->acceptedFileTypes(['application/pdf', 'image/jpeg', 'image/jpg', 'image/png'])
-            ->maxSize(5120)
-            ->maxFiles(5)
-            ->disk('public')
-            ->directory('employee-documents')
-            ->visibility('private')
-            ->downloadable()
-            ->openable()
-            ->previewable()
-            ->reorderable()
-            ->columnSpan(2);
-        
+
         return $fields;
     }
 
@@ -229,6 +214,7 @@ class EmployeeResource extends Resource
         return [
             'index' => Pages\ListEmployees::route('/'),
             'create' => Pages\CreateEmployee::route('/create'),
+            'view' => Pages\ViewEmployee::route('/{record}'),
             'edit' => Pages\EditEmployee::route('/{record}/edit'),
         ];
     }

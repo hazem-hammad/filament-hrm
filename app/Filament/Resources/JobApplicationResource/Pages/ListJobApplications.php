@@ -4,10 +4,15 @@ namespace App\Filament\Resources\JobApplicationResource\Pages;
 
 use App\Filament\Resources\JobApplicationResource;
 use App\Models\JobApplication;
+use App\Models\JobStage;
 use Filament\Actions;
+use Filament\Forms;
+use Filament\Notifications\Notification;
+use Filament\Resources\Components\Tab;
 use Filament\Resources\Pages\ListRecords;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 
 class ListJobApplications extends ListRecords
 {
@@ -72,7 +77,43 @@ class ListJobApplications extends ListRecords
             ->actions([
                 Tables\Actions\ActionGroup::make([
                     Tables\Actions\ViewAction::make(),
-                    Tables\Actions\EditAction::make(),
+                    Tables\Actions\EditAction::make()
+                        ->icon('heroicon-o-pencil'),
+                    Tables\Actions\Action::make('change_stage')
+                        ->label('Change Stage')
+                        ->icon('heroicon-o-arrow-path')
+                        ->color('warning')
+                        ->form([
+                            Forms\Components\Select::make('job_stage_id')
+                                ->label('New Stage')
+                                ->options(function () {
+                                    return JobStage::query()
+                                        ->active()
+                                        ->sorted()
+                                        ->pluck('name', 'id');
+                                })
+                                ->required()
+                                ->searchable()
+                                ->preload()
+                                ->default(fn(JobApplication $record) => $record->job_stage_id),
+                        ])
+                        ->action(function (array $data, JobApplication $record): void {
+                            $oldStage = $record->jobStage->name;
+                            $newStage = JobStage::find($data['job_stage_id'])->name;
+                            
+                            $record->update([
+                                'job_stage_id' => $data['job_stage_id']
+                            ]);
+                            
+                            Notification::make()
+                                ->title('Stage Updated')
+                                ->body("Application stage changed from '{$oldStage}' to '{$newStage}'")
+                                ->success()
+                                ->send();
+                        })
+                        ->modalHeading('Change Application Stage')
+                        ->modalDescription('Select a new stage for this job application.')
+                        ->modalWidth('md'),
                     Tables\Actions\Action::make('toggle_status')
                         ->label(fn(JobApplication $record): string => $record->status ? 'Deactivate' : 'Activate')
                         ->icon(fn(JobApplication $record): string => $record->status ? 'heroicon-o-x-circle' : 'heroicon-o-check-circle')
@@ -90,7 +131,6 @@ class ListJobApplications extends ListRecords
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
                 ]),
             ])
             ->defaultSort('created_at', 'desc');
@@ -101,5 +141,29 @@ class ListJobApplications extends ListRecords
         return [
             Actions\CreateAction::make(),
         ];
+    }
+
+    public function getTabs(): array
+    {
+        $tabs = [];
+        
+        // Add "All Applications" tab
+        $tabs['all'] = Tab::make('All Applications')
+            ->badge(JobApplication::count());
+
+        // Get all active job stages sorted by their sort order
+        $jobStages = JobStage::query()
+            ->active()
+            ->sorted()
+            ->get();
+
+        // Create a tab for each job stage
+        foreach ($jobStages as $stage) {
+            $tabs['stage_' . $stage->id] = Tab::make($stage->name)
+                ->modifyQueryUsing(fn (Builder $query) => $query->where('job_stage_id', $stage->id))
+                ->badge(JobApplication::where('job_stage_id', $stage->id)->count());
+        }
+
+        return $tabs;
     }
 }
