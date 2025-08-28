@@ -209,8 +209,8 @@ class RequestResource extends Resource
                     ->columnSpanFull(),
 
                 Forms\Components\Textarea::make('admin_notes')
-                    ->label('Admin Notes')
-                    ->rows(2)
+                    ->label(fn($record) => $record && $record->status === 'rejected' ? 'Rejection Reason' : 'Admin Notes')
+                    ->rows(3)
                     ->columnSpanFull()
                     ->disabled()
                     ->visible(fn($record) => $record && !empty($record->admin_notes)),
@@ -295,6 +295,13 @@ class RequestResource extends Resource
                     ->toggleable()
                     ->visible(fn($record) => $record && in_array($record->status, ['approved', 'rejected'])),
 
+                Tables\Columns\TextColumn::make('admin_notes')
+                    ->label('Rejection Reason')
+                    ->limit(50)
+                    ->tooltip(fn ($record) => $record && $record->admin_notes ? $record->admin_notes : null)
+                    ->toggleable()
+                    ->visible(fn($record) => $record && $record->status === 'rejected' && !empty($record->admin_notes)),
+
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Submitted At')
                     ->dateTime()
@@ -340,7 +347,7 @@ class RequestResource extends Resource
             ->actions([
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make()
-                    ->visible(fn($record) => $record->status === 'pending'),
+                    ->visible(fn($record) => $record->status === 'pending' && $record->employee_id === auth('employee')->id()),
                 Tables\Actions\Action::make('cancel')
                     ->icon('heroicon-o-x-circle')
                     ->color('danger')
@@ -350,7 +357,7 @@ class RequestResource extends Resource
                     ->requiresConfirmation()
                     ->modalHeading('Cancel Request')
                     ->modalDescription('Are you sure you want to cancel this request?')
-                    ->visible(fn($record) => $record->canBeCancelled()),
+                    ->visible(fn($record) => $record->status === 'pending' && $record->employee_id === auth('employee')->id()),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

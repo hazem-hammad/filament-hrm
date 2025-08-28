@@ -98,6 +98,12 @@ class ListRequests extends ListRecords
                             'approved_by' => $employee->id,
                             'approved_at' => now(),
                         ]);
+                        
+                        \Filament\Notifications\Notification::make()
+                            ->title('Request Approved')
+                            ->body('The request has been approved successfully.')
+                            ->success()
+                            ->send();
                     })
                     ->requiresConfirmation()
                     ->modalHeading('Approve Request')
@@ -120,6 +126,12 @@ class ListRequests extends ListRecords
                             'approved_at' => now(),
                             'admin_notes' => $data['admin_notes'],
                         ]);
+                        
+                        \Filament\Notifications\Notification::make()
+                            ->title('Request Rejected')
+                            ->body('The request has been rejected.')
+                            ->success()
+                            ->send();
                     })
                     ->modalHeading('Reject Request')
                     ->modalSubmitActionLabel('Reject')
@@ -127,11 +139,11 @@ class ListRequests extends ListRecords
             ];
         }
 
-        // Default actions for my requests
+        // Default actions for my requests only (employees can only edit/cancel their own requests)
         return [
             \Filament\Tables\Actions\ViewAction::make(),
             \Filament\Tables\Actions\EditAction::make()
-                ->visible(fn($record) => $record->status === 'pending'),
+                ->visible(fn($record) => $record->status === 'pending' && $record->employee_id === $employee->id),
             \Filament\Tables\Actions\Action::make('cancel')
                 ->icon('heroicon-o-x-circle')
                 ->color('danger')
@@ -141,7 +153,7 @@ class ListRequests extends ListRecords
                 ->requiresConfirmation()
                 ->modalHeading('Cancel Request')
                 ->modalDescription('Are you sure you want to cancel this request?')
-                ->visible(fn($record) => $record->canBeCancelled()),
+                ->visible(fn($record) => $record->status === 'pending' && $record->employee_id === $employee->id),
         ];
     }
 }

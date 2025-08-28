@@ -36,7 +36,7 @@ class EditRequest extends EditRecord
                 ->requiresConfirmation()
                 ->modalHeading('Cancel Request')
                 ->modalDescription('Are you sure you want to cancel this request?')
-                ->visible($this->record->canBeCancelled()),
+                ->visible($this->record->status === 'pending'),
         ];
     }
 
