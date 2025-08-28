@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -27,6 +28,7 @@ class Employee extends Authenticatable implements HasMedia
         'employee_id',
         'department_id',
         'position_id',
+        'reporting_to',
         'company_date_of_joining',
         'status',
         'password_set_at',
@@ -59,6 +61,16 @@ class Employee extends Authenticatable implements HasMedia
     public function position(): BelongsTo
     {
         return $this->belongsTo(Position::class);
+    }
+
+    public function manager(): BelongsTo
+    {
+        return $this->belongsTo(Employee::class, 'reporting_to');
+    }
+
+    public function directReports(): HasMany
+    {
+        return $this->hasMany(Employee::class, 'reporting_to');
     }
 
     public function registerMediaCollections(): void

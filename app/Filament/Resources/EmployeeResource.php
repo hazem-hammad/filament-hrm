@@ -145,6 +145,17 @@ class EmployeeResource extends Resource
                                             ->modalWidth('md');
                                     })
                                     ->required(),
+                                Forms\Components\Select::make('reporting_to')
+                                    ->label('Reports To (Manager)')
+                                    ->placeholder('Select Direct Manager')
+                                    ->relationship('manager', 'name', fn($query, $livewire) => $query
+                                        ->where('status', true)
+                                        ->when($livewire->record ?? null, fn($q) => $q->where('id', '!=', $livewire->record->id))
+                                    )
+                                    ->searchable()
+                                    ->preload()
+                                    ->helperText('Select the direct manager this employee reports to')
+                                    ->columnSpanFull(),
                                 Forms\Components\DatePicker::make('company_date_of_joining')
                                     ->label('Company Date Of Joining')
                                     ->required()

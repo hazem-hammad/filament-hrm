@@ -73,6 +73,13 @@ class ViewEmployee extends ViewRecord
                                     ->badge()
                                     ->color('warning')
                                     ->icon('heroicon-o-briefcase'),
+                                Components\TextEntry::make('manager.name')
+                                    ->label('Reports To (Manager)')
+                                    ->placeholder('No Manager Assigned')
+                                    ->badge()
+                                    ->color('info')
+                                    ->icon('heroicon-o-user-group')
+                                    ->columnSpanFull(),
                                 Components\TextEntry::make('company_date_of_joining')
                                     ->label('Date of Joining')
                                     ->date()

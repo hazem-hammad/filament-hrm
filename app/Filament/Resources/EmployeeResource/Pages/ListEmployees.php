@@ -16,6 +16,7 @@ class ListEmployees extends ListRecords
     public function table(Table $table): Table
     {
         return $table
+            ->modifyQueryUsing(fn($query) => $query->with(['department', 'position', 'manager']))
             ->columns([
                 Tables\Columns\TextColumn::make('employee_id')
                     ->label('Employee ID')
@@ -35,6 +36,12 @@ class ListEmployees extends ListRecords
                     ->label('Position')
                     ->searchable()
                     ->sortable(),
+                Tables\Columns\TextColumn::make('manager.name')
+                    ->label('Reports To')
+                    ->placeholder('No Manager')
+                    ->searchable()
+                    ->sortable()
+                    ->toggleable(),
                 Tables\Columns\TextColumn::make('status')
                     ->formatStateUsing(fn(bool $state): string => $state ? 'Active' : 'Inactive')
                     ->badge()
@@ -58,6 +65,11 @@ class ListEmployees extends ListRecords
                 Tables\Filters\SelectFilter::make('position_id')
                     ->label('Position')
                     ->relationship('position', 'name')
+                    ->searchable()
+                    ->preload(),
+                Tables\Filters\SelectFilter::make('reporting_to')
+                    ->label('Reports To')
+                    ->relationship('manager', 'name')
                     ->searchable()
                     ->preload(),
                 Tables\Filters\TernaryFilter::make('status')
