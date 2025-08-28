@@ -24,9 +24,9 @@ class ListPositions extends ListRecords
                     ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('status')
-                    ->formatStateUsing(fn (bool $state): string => $state ? 'Active' : 'Inactive')
+                    ->formatStateUsing(fn(bool $state): string => $state ? 'Active' : 'Inactive')
                     ->badge()
-                    ->color(fn (bool $state): string => $state ? 'success' : 'danger')
+                    ->color(fn(bool $state): string => $state ? 'success' : 'danger')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
@@ -52,23 +52,22 @@ class ListPositions extends ListRecords
                 Tables\Actions\ActionGroup::make([
                     Tables\Actions\EditAction::make(),
                     Tables\Actions\Action::make('toggle_status')
-                        ->label(fn (Position $record): string => $record->status ? 'Deactivate' : 'Activate')
-                        ->icon(fn (Position $record): string => $record->status ? 'heroicon-o-x-circle' : 'heroicon-o-check-circle')
-                        ->color(fn (Position $record): string => ($record->status ?? false) ? 'danger' : 'success')
+                        ->label(fn(Position $record): string => $record->status ? 'Deactivate' : 'Activate')
+                        ->icon(fn(Position $record): string => $record->status ? 'heroicon-o-x-circle' : 'heroicon-o-check-circle')
+                        ->color(fn(Position $record): string => ($record->status ?? false) ? 'danger' : 'success')
                         ->requiresConfirmation()
-                        ->modalDescription(fn (Position $record): string => 
-                            $record->status 
-                                ? 'Are you sure you want to deactivate this position?' 
+                        ->modalDescription(
+                            fn(Position $record): string =>
+                            $record->status
+                                ? 'Are you sure you want to deactivate this position?'
                                 : 'Are you sure you want to activate this position?'
                         )
-                        ->action(fn (Position $record) => $record->update(['status' => !$record->status])),
+                        ->action(fn(Position $record) => $record->update(['status' => !$record->status])),
                     Tables\Actions\DeleteAction::make(),
                 ])
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
+                Tables\Actions\BulkActionGroup::make([]),
             ]);
     }
 

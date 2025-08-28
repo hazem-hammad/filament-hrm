@@ -21,9 +21,9 @@ class ListDepartments extends ListRecords
                     ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('status')
-                    ->formatStateUsing(fn (bool $state): string => $state ? 'Active' : 'Inactive')
+                    ->formatStateUsing(fn(bool $state): string => $state ? 'Active' : 'Inactive')
                     ->badge()
-                    ->color(fn (bool $state): string => $state ? 'success' : 'danger')
+                    ->color(fn(bool $state): string => $state ? 'success' : 'danger')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
@@ -60,9 +60,7 @@ class ListDepartments extends ListRecords
                 ])
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
+                Tables\Actions\BulkActionGroup::make([]),
             ]);
     }
 

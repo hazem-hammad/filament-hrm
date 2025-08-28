@@ -25,6 +25,7 @@ class DocumentTypeResource extends Resource
                     ->schema([
                         Forms\Components\TextInput::make('name')
                             ->required()
+                            ->columnSpanFull()
                             ->maxLength(255),
                         Forms\Components\Toggle::make('status')
                             ->label('Active')

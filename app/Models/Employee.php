@@ -65,18 +65,18 @@ class Employee extends Authenticatable implements HasMedia
     {
         // Get all document types to create collections
         $documentTypes = \App\Models\DocumentType::query()->active()->get();
-        
+
         foreach ($documentTypes as $documentType) {
             $collection = $this->addMediaCollection($documentType->name)
                 ->acceptsMimeTypes(['application/pdf', 'image/jpeg', 'image/jpg', 'image/png']);
-            
+
             if ($documentType->is_required) {
                 $collection->onlyKeepLatest(1);
             } else {
                 $collection->onlyKeepLatest(3);
             }
         }
-        
+
         // Default collection for other files
         $this->addMediaCollection('other_documents')
             ->acceptsMimeTypes(['application/pdf', 'image/jpeg', 'image/jpg', 'image/png'])
@@ -117,6 +117,6 @@ class Employee extends Authenticatable implements HasMedia
             $newNumber = 1;
         }
 
-        return $prefix . str_pad($newNumber, 8, '0', STR_PAD_LEFT);
+        return $prefix . str_pad($newNumber, 3, '0', STR_PAD_LEFT);
     }
 }

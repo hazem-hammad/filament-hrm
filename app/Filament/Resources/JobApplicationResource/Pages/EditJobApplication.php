@@ -15,10 +15,10 @@ class EditJobApplication extends EditRecord
     {
         // Load custom question answers
         $answers = $this->record->answers()->with('customQuestion')->get();
-        
+
         foreach ($answers as $answer) {
             $questionKey = "question_{$answer->custom_question_id}";
-            
+
             // Handle JSON values (multi-select)
             if ($answer->customQuestion->type === 'multi_select') {
                 $data[$questionKey] = json_decode($answer->answer, true) ?: [];
@@ -26,7 +26,7 @@ class EditJobApplication extends EditRecord
                 $data[$questionKey] = $answer->answer;
             }
         }
-        
+
         return $data;
     }
 
@@ -39,7 +39,7 @@ class EditJobApplication extends EditRecord
                 unset($data[$key]);
             }
         }
-        
+
         return $data;
     }
 
@@ -60,13 +60,13 @@ class EditJobApplication extends EditRecord
         foreach ($data as $key => $value) {
             if (str_starts_with($key, 'question_')) {
                 $questionId = str_replace('question_', '', $key);
-                
+
                 if ($value !== null && $value !== '' && $value !== []) {
                     // Handle array values (multi-select)
                     if (is_array($value)) {
                         $value = json_encode($value);
                     }
-                    
+
                     JobApplicationAnswer::create([
                         'job_application_id' => $jobApplication->id,
                         'custom_question_id' => $questionId,
@@ -79,8 +79,6 @@ class EditJobApplication extends EditRecord
 
     protected function getHeaderActions(): array
     {
-        return [
-            Actions\DeleteAction::make(),
-        ];
+        return [];
     }
 }
