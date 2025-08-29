@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enum\EmployeeLevel;
 use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -28,6 +29,7 @@ class Employee extends Authenticatable implements HasMedia
         'employee_id',
         'department_id',
         'position_id',
+        'level',
         'reporting_to',
         'company_date_of_joining',
         'status',
@@ -42,6 +44,7 @@ class Employee extends Authenticatable implements HasMedia
     protected $casts = [
         'date_of_birth' => 'date',
         'company_date_of_joining' => 'date',
+        'level' => EmployeeLevel::class,
         'status' => 'boolean',
         'password_set_at' => 'datetime',
         'email_verified_at' => 'datetime',
@@ -71,6 +74,11 @@ class Employee extends Authenticatable implements HasMedia
     public function directReports(): HasMany
     {
         return $this->hasMany(Employee::class, 'reporting_to');
+    }
+
+    public function workPlans(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    {
+        return $this->belongsToMany(WorkPlan::class);
     }
 
     public function registerMediaCollections(): void

@@ -91,6 +91,34 @@ class ViewEmployee extends ViewRecord
                                     ->formatStateUsing(fn(bool $state): string => $state ? 'Active' : 'Inactive'),
                             ])
                             ->columns(2),
+
+                        // Work Plans Section
+                        Components\Section::make('Work Plans')
+                            ->schema([
+                                Components\RepeatableEntry::make('workPlans')
+                                    ->label('Assigned Work Plans')
+                                    ->schema([
+                                        Components\TextEntry::make('name')
+                                            ->label('Work Plan Name')
+                                            ->badge()
+                                            ->color('info'),
+                                        Components\TextEntry::make('schedule')
+                                            ->label('Schedule')
+                                            ->icon('heroicon-o-clock'),
+                                        Components\TextEntry::make('working_days_labels')
+                                            ->label('Working Days')
+                                            ->badge()
+                                            ->color('success'),
+                                        Components\TextEntry::make('status')
+                                            ->label('Status')
+                                            ->badge()
+                                            ->color(fn(bool $state): string => $state ? 'success' : 'danger')
+                                            ->formatStateUsing(fn(bool $state): string => $state ? 'Active' : 'Inactive'),
+                                    ])
+                                    ->columns(2)
+                                    ->columnSpanFull(),
+                            ])
+                            ->columnSpanFull(),
                     ])
                     ->columnSpanFull(),
 

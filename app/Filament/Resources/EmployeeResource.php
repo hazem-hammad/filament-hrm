@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Enum\EmployeeLevel;
 use App\Filament\Resources\EmployeeResource\Pages;
 use App\Models\Employee;
 use App\Models\Position;
@@ -145,17 +146,26 @@ class EmployeeResource extends Resource
                                             ->modalWidth('md');
                                     })
                                     ->required(),
+                                Forms\Components\Select::make('level')
+                                    ->label('Employee Level')
+                                    ->placeholder('Select Employee Level')
+                                    ->options(EmployeeLevel::options())
+                                    ->default(EmployeeLevel::ENTRY->value)
+                                    ->required()
+                                    ->helperText('Select the employee level/seniority'),
                                 Forms\Components\Select::make('reporting_to')
                                     ->label('Reports To (Manager)')
                                     ->placeholder('Select Direct Manager')
-                                    ->relationship('manager', 'name', fn($query, $livewire) => $query
-                                        ->where('status', true)
-                                        ->when($livewire->record ?? null, fn($q) => $q->where('id', '!=', $livewire->record->id))
+                                    ->relationship(
+                                        'manager',
+                                        'name',
+                                        fn($query, $livewire) => $query
+                                            ->where('status', true)
+                                            ->when($livewire->record ?? null, fn($q) => $q->where('id', '!=', $livewire->record->id))
                                     )
                                     ->searchable()
                                     ->preload()
-                                    ->helperText('Select the direct manager this employee reports to')
-                                    ->columnSpanFull(),
+                                    ->helperText('Select the direct manager this employee reports to'),
                                 Forms\Components\DatePicker::make('company_date_of_joining')
                                     ->label('Company Date Of Joining')
                                     ->required()
