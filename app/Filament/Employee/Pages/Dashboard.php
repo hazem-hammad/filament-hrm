@@ -6,9 +6,24 @@ use Filament\Pages\Dashboard as BaseDashboard;
 
 class Dashboard extends BaseDashboard
 {
-    protected static ?string $title = 'Employee Dashboard';
-    
+    protected static ?string $title = 'Dashboard';
+
     protected static ?string $navigationIcon = 'heroicon-o-home';
-    
-    protected static string $view = 'filament.employee.pages.dashboard';
+
+    public function getWidgets(): array
+    {
+        return [
+            \App\Filament\Employee\Widgets\CheckInOutWidget::class,
+            \App\Filament\Employee\Widgets\AttendanceTableWidget::class,
+            \App\Filament\Employee\Widgets\AttendanceStatsWidget::class,
+        ];
+    }
+
+    public function getColumns(): int | string | array
+    {
+        return [
+            'md' => 2,
+            'xl' => 3,
+        ];
+    }
 }

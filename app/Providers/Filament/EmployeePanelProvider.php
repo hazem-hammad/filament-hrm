@@ -28,6 +28,7 @@ class EmployeePanelProvider extends PanelProvider
             ->passwordReset()
             ->id(FilamentPanelID::EMPLOYEE->value)
             ->path(FilamentPanelID::EMPLOYEE->value)
+            ->viteTheme('resources/css/filament/employee/theme.css')
             ->brandLogoHeight('30px')
             ->favicon('/images/logos/logo-icon-light.svg')
             ->brandName("HRM")
@@ -45,7 +46,10 @@ class EmployeePanelProvider extends PanelProvider
                 \App\Filament\Employee\Pages\Dashboard::class,
             ])
             ->discoverWidgets(in: app_path('Filament/Employee/Widgets'), for: 'App\\Filament\\Employee\\Widgets')
-            ->widgets([])
+            ->widgets([
+                \App\Filament\Employee\Widgets\CheckInOutWidget::class,
+                \App\Filament\Employee\Widgets\AttendanceTableWidget::class,
+            ])
             ->middleware([
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,

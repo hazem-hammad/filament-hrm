@@ -18,7 +18,8 @@ class ListRequests extends ListRecords
     {
         return [
             Actions\CreateAction::make()
-                ->label('New Request'),
+                ->label('New Request')
+                ->icon('heroicon-o-plus'),
         ];
     }
 

@@ -16,7 +16,7 @@ class ListJobs extends ListRecords
     public function table(Table $table): Table
     {
         return $table
-            ->modifyQueryUsing(fn ($query) => $query->with(['department', 'position', 'customQuestions']))
+            ->modifyQueryUsing(fn($query) => $query->with(['department', 'position', 'customQuestions']))
             ->columns([
                 Tables\Columns\TextColumn::make('title')
                     ->searchable()
@@ -34,8 +34,9 @@ class ListJobs extends ListRecords
                     ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('work_type')
-                    ->formatStateUsing(fn(string $state): string => 
-                        match($state) {
+                    ->formatStateUsing(
+                        fn(string $state): string =>
+                        match ($state) {
                             'full_time' => 'Full Time',
                             'part_time' => 'Part Time',
                             'contract' => 'Contract',
@@ -47,8 +48,9 @@ class ListJobs extends ListRecords
                     ->color('primary')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('work_mode')
-                    ->formatStateUsing(fn(string $state): string => 
-                        match($state) {
+                    ->formatStateUsing(
+                        fn(string $state): string =>
+                        match ($state) {
                             'remote' => 'Remote',
                             'onsite' => 'Onsite',
                             'hybrid' => 'Hybrid',
@@ -60,8 +62,9 @@ class ListJobs extends ListRecords
                     ->sortable(),
                 Tables\Columns\TextColumn::make('experience_level')
                     ->label('Experience')
-                    ->formatStateUsing(fn(string $state): string => 
-                        match($state) {
+                    ->formatStateUsing(
+                        fn(string $state): string =>
+                        match ($state) {
                             'entry' => 'Entry',
                             'junior' => 'Junior',
                             'mid' => 'Mid',
@@ -86,13 +89,15 @@ class ListJobs extends ListRecords
                     ->sortable(),
                 Tables\Columns\TextColumn::make('customQuestions')
                     ->label('Custom Questions')
-                    ->formatStateUsing(fn(Job $record): string => 
-                        $record->customQuestions->count() > 0 
+                    ->formatStateUsing(
+                        fn(Job $record): string =>
+                        $record->customQuestions->count() > 0
                             ? $record->customQuestions->count() . ' questions'
                             : 'No questions'
                     )
                     ->badge()
-                    ->color(fn(Job $record): string => 
+                    ->color(
+                        fn(Job $record): string =>
                         $record->customQuestions->count() > 0 ? 'success' : 'gray'
                     )
                     ->toggleable(),
@@ -168,7 +173,14 @@ class ListJobs extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make(),
+            Actions\CreateAction::make()
+                ->icon('heroicon-o-plus'),
+            Actions\Action::make('careers')
+                ->label('Careers')
+                ->icon('heroicon-o-arrow-top-right-on-square')
+                ->color('success')
+                ->url('/careers')
+                ->openUrlInNewTab(),
         ];
     }
 }

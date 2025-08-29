@@ -22,3 +22,8 @@ Route::get('/careers', [CareerController::class, 'index'])->name('jobs.index');
 Route::get('/careers/{slug}', [CareerController::class, 'show'])->name('jobs.show');
 // route for job application submission
 Route::post('/careers/{slug}/apply', [CareerController::class, 'apply'])->name('job.apply');
+
+// Employee attendance duration API for real-time updates
+Route::middleware(['auth:employee'])->group(function () {
+    Route::get('/employee/attendance/duration', [App\Http\Controllers\Api\V1\Employee\AttendanceController::class, 'getDuration']);
+});
