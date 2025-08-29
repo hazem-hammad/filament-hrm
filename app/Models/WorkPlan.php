@@ -15,6 +15,7 @@ class WorkPlan extends Model
         'start_time',
         'end_time',
         'working_days',
+        'permission_minutes',
         'status',
     ];
 
@@ -22,6 +23,7 @@ class WorkPlan extends Model
         'start_time' => 'datetime:H:i',
         'end_time' => 'datetime:H:i',
         'working_days' => 'array',
+        'permission_minutes' => 'integer',
         'status' => 'boolean',
     ];
 
@@ -50,5 +52,23 @@ class WorkPlan extends Model
     public function getScheduleAttribute(): string
     {
         return $this->start_time->format('H:i') . ' - ' . $this->end_time->format('H:i');
+    }
+
+    public function getPermissionMinutesLabelAttribute(): string
+    {
+        if ($this->permission_minutes === 0) {
+            return 'No grace period';
+        }
+
+        $hours = intdiv($this->permission_minutes, 60);
+        $minutes = $this->permission_minutes % 60;
+
+        if ($hours > 0 && $minutes > 0) {
+            return "{$hours}h {$minutes}m grace period";
+        } elseif ($hours > 0) {
+            return "{$hours}h grace period";
+        } else {
+            return "{$minutes}m grace period";
+        }
     }
 }

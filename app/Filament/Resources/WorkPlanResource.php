@@ -48,6 +48,16 @@ class WorkPlanResource extends Resource
                             ->columns(3)
                             ->required()
                             ->columnSpanFull(),
+                        Forms\Components\TextInput::make('permission_minutes')
+                            ->label('Permission Minutes (Grace Period)')
+                            ->placeholder('Enter minutes allowed before deduction')
+                            ->numeric()
+                            ->minValue(0)
+                            ->maxValue(1440)
+                            ->default(0)
+                            ->suffix('minutes')
+                            ->helperText('Number of minutes allowed before calculating attendance deductions (0 = no grace period, max 1440 = 24 hours)')
+                            ->columnSpanFull(),
                     ])
                     ->columns(2),
                 Forms\Components\Section::make('Assign Employees')

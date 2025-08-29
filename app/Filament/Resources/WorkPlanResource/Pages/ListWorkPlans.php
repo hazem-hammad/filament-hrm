@@ -36,6 +36,13 @@ class ListWorkPlans extends ListRecords
                     ->wrap()
                     ->searchable(false)
                     ->sortable(false),
+                Tables\Columns\TextColumn::make('permission_minutes_label')
+                    ->label('Grace Period')
+                    ->badge()
+                    ->color(fn($record): string => $record->permission_minutes > 0 ? 'warning' : 'gray')
+                    ->searchable(false)
+                    ->sortable('permission_minutes')
+                    ->toggleable(),
                 Tables\Columns\TextColumn::make('employees_count')
                     ->label('Assigned Employees')
                     ->badge()

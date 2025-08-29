@@ -49,6 +49,12 @@ class ViewWorkPlan extends ViewRecord
                                     ->color('info')
                                     ->icon('heroicon-o-calendar-days')
                                     ->columnSpanFull(),
+                                Components\TextEntry::make('permission_minutes_label')
+                                    ->label('Grace Period')
+                                    ->badge()
+                                    ->color(fn($record): string => $record->permission_minutes > 0 ? 'warning' : 'gray')
+                                    ->icon('heroicon-o-clock')
+                                    ->columnSpanFull(),
                             ])
                     ])
                     ->columns(2),
