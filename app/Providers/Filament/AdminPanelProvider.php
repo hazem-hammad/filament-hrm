@@ -55,7 +55,12 @@ class AdminPanelProvider extends PanelProvider
                 \App\Filament\Pages\Dashboard::class,
             ])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
-            ->widgets([])
+            ->widgets([
+                \App\Filament\Widgets\EmployeeStatsWidget::class,
+                \App\Filament\Widgets\EmployeeOverviewWidget::class,
+                \App\Filament\Widgets\RequestTrendsWidget::class,
+                \App\Filament\Widgets\EmployeeActivityWidget::class,
+            ])
             ->middleware([
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,
