@@ -28,6 +28,7 @@ class EmployeePanelProvider extends PanelProvider
             ->passwordReset()
             ->id(FilamentPanelID::EMPLOYEE->value)
             ->path(FilamentPanelID::EMPLOYEE->value)
+            ->topNavigation()
             ->viteTheme('resources/css/filament/employee/theme.css')
             ->brandLogoHeight('30px')
             ->favicon('/images/logos/logo-icon-light.svg')
