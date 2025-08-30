@@ -64,6 +64,23 @@
 - [ ] Performance analytics and reports
 - [ ] Performance-based recommendations
 
+### 📄 **Contract Management System**
+- [ ] Employee contract creation and management
+- [ ] Contract templates (Permanent, Temporary, Freelance, Probation)
+- [ ] Digital contract signing with e-signatures
+- [ ] Contract renewal notifications and automation
+- [ ] Contract expiry tracking and alerts
+- [ ] Amendment and addendum management
+- [ ] Contract version control and history
+- [ ] Salary revision contracts
+- [ ] Non-disclosure agreements (NDAs)
+- [ ] Contract compliance monitoring
+- [ ] Bulk contract operations
+- [ ] Contract analytics and reporting
+- [ ] Integration with document management
+- [ ] Contract approval workflows
+- [ ] Legal review and approval process
+
 ### 🎓 **Learning & Development**
 - [ ] Training program management
 - [ ] Course catalog and enrollment

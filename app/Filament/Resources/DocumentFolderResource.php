@@ -17,6 +17,10 @@ class DocumentFolderResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
+    protected static ?string $navigationGroup = 'HR Setup';
+    
+    protected static ?string $navigationLabel = 'Document Manager';
+
     public static function form(Form $form): Form
     {
         return $form

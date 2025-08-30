@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\EmployeeResource\Pages;
 
 use App\Filament\Resources\EmployeeResource;
+use App\Http\Resources\MediaResource;
 use Filament\Actions\EditAction;
 use Filament\Infolists\Components;
 use Filament\Infolists\Infolist;
@@ -11,6 +12,17 @@ use Filament\Resources\Pages\ViewRecord;
 class ViewEmployee extends ViewRecord
 {
     protected static string $resource = EmployeeResource::class;
+
+    protected function resolveRecord(int|string $key): \Illuminate\Database\Eloquent\Model
+    {
+        return static::getResource()::resolveRecordRouteBinding($key)
+            ->load([
+                'documents.folder',
+                'directReports.position',
+                'directReports.department',
+                'workPlans'
+            ]);
+    }
 
     public function infolist(Infolist $infolist): Infolist
     {
@@ -118,31 +130,91 @@ class ViewEmployee extends ViewRecord
                                     ->columnSpanFull(),
                             ])
                             ->columnSpanFull(),
-                    ])
-                    ->columnSpanFull(),
 
-                // Documents Section
-                Components\Section::make('Documents')
-                    ->schema([
-                        Components\SpatieMediaLibraryImageEntry::make('documents')
-                            ->label('Employee Documents')
-                            ->collection('documents')
-                            ->conversion('thumb')
-                            ->limit(10)
-                            ->columnSpan(2),
-                        
-                        Components\SpatieMediaLibraryImageEntry::make('profile')
-                            ->label('Profile Image')
-                            ->collection('profile')
-                            ->conversion('thumb')
-                            ->limit(1)
-                            ->columnSpan(1),
+                        // Employee Documents Section
+                        Components\Section::make('Employee Documents')
+                            ->schema([
+                                Components\RepeatableEntry::make('documents')
+                                    ->label('Assigned Documents')
+                                    ->schema([
+                                        Components\TextEntry::make('name')
+                                            ->label('Document Name')
+                                            ->icon(fn($record) => $record->file_icon ?? 'heroicon-o-document')
+                                            ->iconColor(fn($record) => $record->file_color ?? 'gray')
+                                            ->weight('medium'),
+                                        Components\TextEntry::make('description')
+                                            ->label('Description')
+                                            ->placeholder('No description')
+                                            ->limit(50),
+                                        Components\TextEntry::make('folder.name')
+                                            ->label('Folder')
+                                            ->badge()
+                                            ->color('primary')
+                                            ->placeholder('Root'),
+                                        Components\TextEntry::make('formatted_size')
+                                            ->label('Size')
+                                            ->badge()
+                                            ->color('success'),
+                                        Components\TextEntry::make('file_type')
+                                            ->label('Type')
+                                            ->badge()
+                                            ->color('info')
+                                            ->formatStateUsing(fn(string $state): string => strtoupper($state)),
+                                        Components\TextEntry::make('created_at')
+                                            ->label('Uploaded')
+                                            ->since()
+                                            ->icon('heroicon-o-calendar'),
+                                    ])
+                                    ->columns(3)
+                                    ->columnSpanFull()
+                                    ->placeholder('No documents assigned to this employee'),
+                            ])
+                            ->columnSpanFull()
+                            ->visible(fn($record) => $record->documents->count() > 0),
+
+                        // Team Members Section (for managers)
+                        Components\Section::make('Team Members')
+                            ->schema([
+                                Components\RepeatableEntry::make('directReports')
+                                    ->label('Direct Reports')
+                                    ->schema([
+                                        Components\TextEntry::make('name')
+                                            ->label('Employee Name')
+                                            ->icon('heroicon-o-user')
+                                            ->weight('medium'),
+                                        Components\TextEntry::make('employee_id')
+                                            ->label('Employee ID')
+                                            ->badge()
+                                            ->color('primary'),
+                                        Components\TextEntry::make('position.name')
+                                            ->label('Position')
+                                            ->badge()
+                                            ->color('warning')
+                                            ->placeholder('No position assigned'),
+                                        Components\TextEntry::make('department.name')
+                                            ->label('Department')
+                                            ->badge()
+                                            ->color('success'),
+                                        Components\TextEntry::make('status')
+                                            ->label('Status')
+                                            ->badge()
+                                            ->color(fn(bool $state): string => $state ? 'success' : 'danger')
+                                            ->formatStateUsing(fn(bool $state): string => $state ? 'Active' : 'Inactive'),
+                                        Components\TextEntry::make('company_date_of_joining')
+                                            ->label('Joining Date')
+                                            ->date()
+                                            ->icon('heroicon-o-calendar-days'),
+                                    ])
+                                    ->columns(3)
+                                    ->columnSpanFull()
+                                    ->placeholder('This employee has no direct reports'),
+                            ])
+                            ->columnSpanFull()
+                            ->visible(fn($record) => $record->directReports->count() > 0),
                     ])
-                    ->columns(2)
                     ->columnSpanFull(),
             ]);
     }
-
 
     protected function getHeaderActions(): array
     {

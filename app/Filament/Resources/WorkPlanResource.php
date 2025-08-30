@@ -4,22 +4,20 @@ namespace App\Filament\Resources;
 
 use App\Enum\WorkingDay;
 use App\Filament\Resources\WorkPlanResource\Pages;
-use App\Filament\Resources\WorkPlanResource\RelationManagers;
-use App\Models\Employee;
 use App\Models\WorkPlan;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class WorkPlanResource extends Resource
 {
     protected static ?string $model = WorkPlan::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-clock';
+
+    protected static ?string $navigationGroup = 'HR Setup';
 
     public static function form(Form $form): Form
     {

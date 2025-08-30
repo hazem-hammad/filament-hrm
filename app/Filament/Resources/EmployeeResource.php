@@ -175,41 +175,6 @@ class EmployeeResource extends Resource
                     ])
                     ->columnSpanFull(),
 
-                // Documents Section
-                Forms\Components\Section::make('Document')
-                    ->schema([
-                        SpatieMediaLibraryFileUpload::make('documents')
-                            ->label('Employee Documents')
-                            ->collection('documents')
-                            ->acceptedFileTypes(['application/pdf', 'image/jpeg', 'image/jpg', 'image/png'])
-                            ->maxSize(5120)
-                            ->disk('public')
-                            ->directory('employee-documents')
-                            ->visibility('private')
-                            ->downloadable()
-                            ->openable()
-                            ->previewable()
-                            ->reorderable()
-                            ->maxFiles(10)
-                            ->columnSpanFull(),
-                        
-                        SpatieMediaLibraryFileUpload::make('profile')
-                            ->label('Profile Image')
-                            ->collection('profile')
-                            ->acceptedFileTypes(['image/jpeg', 'image/jpg', 'image/png'])
-                            ->maxSize(2048)
-                            ->disk('public')
-                            ->directory('employee-profiles')
-                            ->visibility('public')
-                            ->downloadable()
-                            ->openable()
-                            ->previewable()
-                            ->image()
-                            ->maxFiles(1)
-                            ->columnSpan(1),
-                    ])
-                    ->columns(2)
-                    ->columnSpanFull(),
             ]);
     }
 

@@ -81,13 +81,13 @@ class Employee extends Authenticatable implements HasMedia
         return $this->belongsToMany(WorkPlan::class);
     }
 
+    public function documents(): HasMany
+    {
+        return $this->hasMany(Document::class, 'assigned_to');
+    }
+
     public function registerMediaCollections(): void
     {
-        // Employee documents collection
-        $this->addMediaCollection('documents')
-            ->acceptsMimeTypes(['application/pdf', 'image/jpeg', 'image/jpg', 'image/png'])
-            ->onlyKeepLatest(10);
-
         // Profile image collection
         $this->addMediaCollection('profile')
             ->acceptsMimeTypes(['image/jpeg', 'image/jpg', 'image/png'])

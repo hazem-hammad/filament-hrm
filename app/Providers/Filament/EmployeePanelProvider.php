@@ -35,7 +35,7 @@ class EmployeePanelProvider extends PanelProvider
             ->brandLogo(get_setting('logo_light', '/images/logos/logo-light.svg'))
             ->darkModeBrandLogo(get_setting('logo_dark', '/images/logos/logo-dark.svg'))
             ->login()
-            ->darkMode(true)
+            ->darkMode(true, true)
             ->colors([
                 'primary' => '#eb4034',
             ])

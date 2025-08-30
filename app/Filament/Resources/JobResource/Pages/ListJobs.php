@@ -178,7 +178,7 @@ class ListJobs extends ListRecords
             Actions\Action::make('careers')
                 ->label('Careers')
                 ->icon('heroicon-o-arrow-top-right-on-square')
-                ->color('success')
+                ->color('danger')
                 ->url('/careers')
                 ->openUrlInNewTab(),
         ];
