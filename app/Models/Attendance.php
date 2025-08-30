@@ -119,7 +119,12 @@ class Attendance extends Model
         $expectedStart = Carbon::parse($workPlan->start_time);
         $actualStart = Carbon::parse($this->check_in_time);
         
-        $lateMinutes = max(0, $actualStart->diffInMinutes($expectedStart));
+        // Only calculate late minutes if actual check-in is after expected start time
+        if ($actualStart->lte($expectedStart)) {
+            return 0; // Employee is on time or early
+        }
+
+        $lateMinutes = $expectedStart->diffInMinutes($actualStart);
         
         // Apply grace period
         $lateMinutes = max(0, $lateMinutes - $workPlan->permission_minutes);
