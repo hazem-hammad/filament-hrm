@@ -33,6 +33,16 @@ class EmployeeResource extends Resource
                         // Personal Detail Section
                         Forms\Components\Section::make('Personal Detail')
                             ->schema([
+                                SpatieMediaLibraryFileUpload::make('profile')
+                                    ->label('Profile Photo')
+                                    ->collection('profile')
+                                    ->image()
+                                    ->imageEditor()
+                                    ->imageCropAspectRatio('1:1')
+                                    ->imageResizeTargetWidth(300)
+                                    ->imageResizeTargetHeight(300)
+                                    ->columnSpanFull()
+                                    ->helperText('Upload a profile photo (recommended size: 300x300px)'),
                                 Forms\Components\TextInput::make('name')
                                     ->label('Name')
                                     ->placeholder('Enter employee name')
@@ -44,7 +54,7 @@ class EmployeeResource extends Resource
                                     ->tel()
                                     ->required()
                                     ->maxLength(255)
-                                    ->helperText('Please use with country code. (ex. +91)'),
+                                    ->helperText('Please use with country code. (ex. +20)'),
                                 Forms\Components\DatePicker::make('date_of_birth')
                                     ->label('Date of Birth')
                                     ->required()

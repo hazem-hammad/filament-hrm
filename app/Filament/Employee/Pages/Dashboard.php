@@ -15,7 +15,7 @@ class Dashboard extends BaseDashboard
         return [
             \App\Filament\Employee\Widgets\CheckInOutWidget::class,
             \App\Filament\Employee\Widgets\AttendanceTableWidget::class,
-            \App\Filament\Employee\Widgets\AttendanceStatsWidget::class,
+            \App\Filament\Employee\Widgets\BirthdayReminderWidget::class,
         ];
     }
 

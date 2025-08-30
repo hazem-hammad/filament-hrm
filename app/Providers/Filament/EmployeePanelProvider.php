@@ -45,11 +45,13 @@ class EmployeePanelProvider extends PanelProvider
             ->discoverPages(in: app_path('Filament/Employee/Pages'), for: 'App\\Filament\\Employee\\Pages')
             ->pages([
                 \App\Filament\Employee\Pages\Dashboard::class,
+                \App\Filament\Employee\Pages\MyProfile::class,
             ])
             ->discoverWidgets(in: app_path('Filament/Employee/Widgets'), for: 'App\\Filament\\Employee\\Widgets')
             ->widgets([
                 \App\Filament\Employee\Widgets\CheckInOutWidget::class,
                 \App\Filament\Employee\Widgets\AttendanceTableWidget::class,
+                \App\Filament\Employee\Widgets\BirthdayReminderWidget::class,
             ])
             ->middleware([
                 EncryptCookies::class,
