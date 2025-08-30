@@ -13,6 +13,7 @@ class Dashboard extends BaseDashboard
     public function getWidgets(): array
     {
         return [
+            \App\Filament\Employee\Widgets\MyBirthdayWidget::class,
             \App\Filament\Employee\Widgets\CheckInOutWidget::class,
             \App\Filament\Employee\Widgets\AttendanceTableWidget::class,
             \App\Filament\Employee\Widgets\BirthdayReminderWidget::class,
