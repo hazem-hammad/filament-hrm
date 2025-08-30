@@ -11,12 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('document_types', function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
-            $table->boolean('status')->default(true);
-            $table->boolean('is_required')->default(false);
-            $table->timestamps();
+        Schema::table('documents', function (Blueprint $table) {
+            $table->string('original_filename')->nullable()->after('name');
         });
     }
 
@@ -25,6 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('document_types');
+        Schema::table('documents', function (Blueprint $table) {
+            $table->dropColumn('original_filename');
+        });
     }
 };

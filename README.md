@@ -345,8 +345,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - 💬 [GitHub Issues](https://github.com/hazem-hammad/filament-hrm/issues)
 
 ### **Contact**
-- 👨‍💻 **Developer:** Hazem Hammad
-- 📧 **Email:** hazem.hammad@example.com
+- 👨‍💻 **Developer:** Hazem Hamqad
+- 📧 **Email:** hazem.hamaad@outlook.com
 - 🐙 **GitHub:** [@hazem-hammad](https://github.com/hazem-hammad)
 
 ---

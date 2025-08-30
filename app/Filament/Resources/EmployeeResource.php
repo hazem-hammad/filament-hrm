@@ -6,7 +6,6 @@ use App\Enum\EmployeeLevel;
 use App\Filament\Resources\EmployeeResource\Pages;
 use App\Models\Employee;
 use App\Models\Position;
-use App\Models\DocumentType;
 use Filament\Forms;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\Form;
@@ -178,7 +177,37 @@ class EmployeeResource extends Resource
 
                 // Documents Section
                 Forms\Components\Section::make('Document')
-                    ->schema(static::getDocumentFields())
+                    ->schema([
+                        SpatieMediaLibraryFileUpload::make('documents')
+                            ->label('Employee Documents')
+                            ->collection('documents')
+                            ->acceptedFileTypes(['application/pdf', 'image/jpeg', 'image/jpg', 'image/png'])
+                            ->maxSize(5120)
+                            ->disk('public')
+                            ->directory('employee-documents')
+                            ->visibility('private')
+                            ->downloadable()
+                            ->openable()
+                            ->previewable()
+                            ->reorderable()
+                            ->maxFiles(10)
+                            ->columnSpanFull(),
+                        
+                        SpatieMediaLibraryFileUpload::make('profile')
+                            ->label('Profile Image')
+                            ->collection('profile')
+                            ->acceptedFileTypes(['image/jpeg', 'image/jpg', 'image/png'])
+                            ->maxSize(2048)
+                            ->disk('public')
+                            ->directory('employee-profiles')
+                            ->visibility('public')
+                            ->downloadable()
+                            ->openable()
+                            ->previewable()
+                            ->image()
+                            ->maxFiles(1)
+                            ->columnSpan(1),
+                    ])
                     ->columns(2)
                     ->columnSpanFull(),
             ]);
@@ -189,39 +218,6 @@ class EmployeeResource extends Resource
         return $table;
     }
 
-    protected static function getDocumentFields(): array
-    {
-        $fields = [];
-
-        // Get all document types
-        $documentTypes = DocumentType::query()->active()->get();
-
-        foreach ($documentTypes as $documentType) {
-            $field = SpatieMediaLibraryFileUpload::make($documentType->name)
-                ->label($documentType->name)
-                ->collection($documentType->name)
-                ->acceptedFileTypes(['application/pdf', 'image/jpeg', 'image/jpg', 'image/png'])
-                ->maxSize(5120)
-                ->disk('public')
-                ->directory('employee-documents')
-                ->visibility('private')
-                ->downloadable()
-                ->openable()
-                ->previewable()
-                ->reorderable()
-                ->columnSpan(1);
-
-            if ($documentType->is_required) {
-                $field->required()->maxFiles(1);
-            } else {
-                $field->maxFiles(3);
-            }
-
-            $fields[] = $field;
-        }
-
-        return $fields;
-    }
 
     public static function getRelations(): array
     {

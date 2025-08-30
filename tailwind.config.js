@@ -12,6 +12,7 @@ export default {
         './resources/**/*.vue',
         './app/Filament/**/*.php',
         './resources/views/filament/**/*.blade.php',
+        './resources/views/filament/resources/**/*.blade.php',
         './vendor/filament/**/*.blade.php',
     ],
     theme: {

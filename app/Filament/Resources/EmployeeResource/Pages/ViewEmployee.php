@@ -3,7 +3,6 @@
 namespace App\Filament\Resources\EmployeeResource\Pages;
 
 use App\Filament\Resources\EmployeeResource;
-use App\Models\DocumentType;
 use Filament\Actions\EditAction;
 use Filament\Infolists\Components;
 use Filament\Infolists\Infolist;
@@ -124,39 +123,26 @@ class ViewEmployee extends ViewRecord
 
                 // Documents Section
                 Components\Section::make('Documents')
-                    ->schema(static::getDocumentInfoEntries())
+                    ->schema([
+                        Components\SpatieMediaLibraryImageEntry::make('documents')
+                            ->label('Employee Documents')
+                            ->collection('documents')
+                            ->conversion('thumb')
+                            ->limit(10)
+                            ->columnSpan(2),
+                        
+                        Components\SpatieMediaLibraryImageEntry::make('profile')
+                            ->label('Profile Image')
+                            ->collection('profile')
+                            ->conversion('thumb')
+                            ->limit(1)
+                            ->columnSpan(1),
+                    ])
                     ->columns(2)
                     ->columnSpanFull(),
             ]);
     }
 
-    protected static function getDocumentInfoEntries(): array
-    {
-        $entries = [];
-
-        // Get all document types
-        $documentTypes = DocumentType::query()->where('status', true)->get();
-
-        foreach ($documentTypes as $documentType) {
-            // dd($documentType);
-            $entries[] = Components\SpatieMediaLibraryImageEntry::make($documentType->name)
-                ->label($documentType->name)
-                ->collection($documentType->name)
-                ->conversion('thumb')
-                ->limit(3)
-                ->columnSpan(1);
-        }
-
-        // Add other documents entry
-        // $entries[] = Components\SpatieMediaLibraryImageEntry::make('other_documents')
-        //     ->label('Other Documents')
-        //     ->collection('other_documents')
-        //     ->conversion('thumb')
-        //     ->limit(5)
-        //     ->columnSpan(2);
-
-        return $entries;
-    }
 
     protected function getHeaderActions(): array
     {

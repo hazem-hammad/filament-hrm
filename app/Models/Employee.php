@@ -83,24 +83,15 @@ class Employee extends Authenticatable implements HasMedia
 
     public function registerMediaCollections(): void
     {
-        // Get all document types to create collections
-        $documentTypes = \App\Models\DocumentType::query()->active()->get();
-
-        foreach ($documentTypes as $documentType) {
-            $collection = $this->addMediaCollection($documentType->name)
-                ->acceptsMimeTypes(['application/pdf', 'image/jpeg', 'image/jpg', 'image/png']);
-
-            if ($documentType->is_required) {
-                $collection->onlyKeepLatest(1);
-            } else {
-                $collection->onlyKeepLatest(3);
-            }
-        }
-
-        // Default collection for other files
-        $this->addMediaCollection('other_documents')
+        // Employee documents collection
+        $this->addMediaCollection('documents')
             ->acceptsMimeTypes(['application/pdf', 'image/jpeg', 'image/jpg', 'image/png'])
-            ->onlyKeepLatest(5);
+            ->onlyKeepLatest(10);
+
+        // Profile image collection
+        $this->addMediaCollection('profile')
+            ->acceptsMimeTypes(['image/jpeg', 'image/jpg', 'image/png'])
+            ->onlyKeepLatest(1);
     }
 
     public function registerMediaConversions(?Media $media = null): void

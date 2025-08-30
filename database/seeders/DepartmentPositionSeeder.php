@@ -47,16 +47,5 @@ class DepartmentPositionSeeder extends Seeder
             }
         }
 
-        $documentTypes = [
-            ['name' => 'Resume', 'status' => true, 'is_required' => true],
-            ['name' => 'Cover Letter', 'status' => true, 'is_required' => false],
-            ['name' => 'ID Copy', 'status' => true, 'is_required' => true],
-            ['name' => 'Educational Certificate', 'status' => true, 'is_required' => true],
-            ['name' => 'Experience Letter', 'status' => true, 'is_required' => false],
-        ];
-
-        foreach ($documentTypes as $docType) {
-            \App\Models\DocumentType::create($docType);
-        }
     }
 }
