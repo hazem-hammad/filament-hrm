@@ -42,7 +42,7 @@ class RequestResource extends Resource
                                     ->required()
                                     ->live()
                                     ->columnSpanFull(),
-                                
+
                                 Forms\Components\Select::make('request_type')
                                     ->label('Request Type')
                                     ->options(Request::REQUEST_TYPES)
@@ -53,7 +53,7 @@ class RequestResource extends Resource
                                         $set('requestable_type', null);
                                     })
                                     ->columnSpanFull(),
-                                
+
                                 Forms\Components\Select::make('requestable_id')
                                     ->label(function (Forms\Get $get) {
                                         return $get('request_type') === 'vacation' ? 'Vacation Type' : 'Attendance Type';
@@ -78,11 +78,11 @@ class RequestResource extends Resource
                                             }
                                         }
                                     })
-                                    ->visible(fn (Forms\Get $get) => filled($get('request_type')))
+                                    ->visible(fn(Forms\Get $get) => filled($get('request_type')))
                                     ->columnSpanFull(),
-                                
+
                                 Forms\Components\Hidden::make('requestable_type'),
-                                
+
                                 // Balance Display
                                 Forms\Components\Placeholder::make('balance_info')
                                     ->label('Remaining Balance')
@@ -108,7 +108,7 @@ class RequestResource extends Resource
                                                 ->sum('total_days');
 
                                             $remaining = max(0, $vacationType->balance - $usedDays);
-                                            
+
                                             return "🏖️ {$remaining} days remaining out of {$vacationType->balance} annual days";
                                         } else {
                                             $attendanceType = AttendanceType::find($get('requestable_id'));
@@ -130,7 +130,7 @@ class RequestResource extends Resource
 
                                             $usedHours = $monthlyUsage->total_hours ?? 0;
                                             $usedRequests = $monthlyUsage->total_requests ?? 0;
-                                            
+
                                             $info = [];
                                             if ($attendanceType->max_hours_per_month) {
                                                 $remainingHours = max(0, $attendanceType->max_hours_per_month - $usedHours);
@@ -144,7 +144,7 @@ class RequestResource extends Resource
                                             return empty($info) ? '♾️ No monthly limits' : implode(' • ', $info);
                                         }
                                     })
-                                    ->visible(fn (Forms\Get $get) => filled($get('requestable_id')))
+                                    ->visible(fn(Forms\Get $get) => filled($get('requestable_id')))
                                     ->columnSpanFull(),
                             ])
                             ->columns(1),
@@ -169,17 +169,17 @@ class RequestResource extends Resource
                                                 if (!$value || !$get('requestable_id') || !$get('employee_id')) {
                                                     return;
                                                 }
-                                                
+
                                                 $vacationType = VacationType::find($get('requestable_id'));
                                                 if (!$vacationType) return;
-                                                
+
                                                 if ($vacationType->required_days_before > 0) {
                                                     $noticeDate = now()->addDays($vacationType->required_days_before);
                                                     if (\Carbon\Carbon::parse($value)->lt($noticeDate)) {
                                                         $fail("This vacation type requires {$vacationType->required_days_before} days advance notice.");
                                                     }
                                                 }
-                                                
+
                                                 $employee = Employee::find($get('employee_id'));
                                                 if ($employee && !$vacationType->isAvailableForEmployee($employee)) {
                                                     $fail("This vacation type is not yet available. You need to wait {$vacationType->unlock_after_months} months after joining.");
@@ -204,10 +204,10 @@ class RequestResource extends Resource
                                                 if (!$value || !$get('start_date')) {
                                                     return;
                                                 }
-                                                
+
                                                 $startDate = \Carbon\Carbon::parse($get('start_date'));
                                                 $endDate = \Carbon\Carbon::parse($value);
-                                                
+
                                                 if ($endDate->lt($startDate)) {
                                                     $fail('End date must be after or equal to start date.');
                                                 }
@@ -224,12 +224,12 @@ class RequestResource extends Resource
                                                 if (!$value || !$get('requestable_id') || !$get('employee_id')) {
                                                     return;
                                                 }
-                                                
+
                                                 $vacationType = VacationType::find($get('requestable_id'));
                                                 $employee = Employee::find($get('employee_id'));
-                                                
+
                                                 if (!$vacationType || !$employee) return;
-                                                
+
                                                 $currentYear = now()->year;
                                                 $usedDays = Request::where('employee_id', $employee->id)
                                                     ->where('requestable_type', VacationType::class)
@@ -237,9 +237,9 @@ class RequestResource extends Resource
                                                     ->where('status', 'approved')
                                                     ->whereYear('start_date', $currentYear)
                                                     ->sum('total_days');
-                                                
+
                                                 $remainingBalance = max(0, $vacationType->balance - $usedDays);
-                                                
+
                                                 if ($value > $remainingBalance) {
                                                     $fail("Insufficient balance. You have {$remainingBalance} days remaining for this vacation type.");
                                                 }
@@ -248,7 +248,7 @@ class RequestResource extends Resource
                                     ])
                                     ->columnSpanFull(),
                             ])
-                            ->visible(fn (Forms\Get $get) => $get('request_type') === 'vacation')
+                            ->visible(fn(Forms\Get $get) => $get('request_type') === 'vacation')
                             ->columns(2),
 
                         // Attendance Fields Section
@@ -273,12 +273,12 @@ class RequestResource extends Resource
                                                 if (!$value || !$get('requestable_id') || !$get('employee_id')) {
                                                     return;
                                                 }
-                                                
+
                                                 $attendanceType = AttendanceType::find($get('requestable_id'));
                                                 $employee = Employee::find($get('employee_id'));
-                                                
+
                                                 if (!$attendanceType || !$employee) return;
-                                                
+
                                                 if ($attendanceType->has_limit) {
                                                     $currentMonth = now()->format('Y-m');
                                                     $monthlyUsage = Request::where('employee_id', $employee->id)
@@ -288,14 +288,14 @@ class RequestResource extends Resource
                                                         ->where('request_date', 'like', $currentMonth . '%')
                                                         ->selectRaw('SUM(hours) as total_hours, COUNT(*) as total_requests')
                                                         ->first();
-                                                    
+
                                                     $usedHours = $monthlyUsage->total_hours ?? 0;
                                                     $usedRequests = $monthlyUsage->total_requests ?? 0;
-                                                    
+
                                                     if ($attendanceType->max_hours_per_request && $value > $attendanceType->max_hours_per_request) {
                                                         $fail("Request exceeds maximum hours per request ({$attendanceType->max_hours_per_request} hours).");
                                                     }
-                                                    
+
                                                     if ($attendanceType->max_hours_per_month) {
                                                         $totalHoursAfterRequest = $usedHours + $value;
                                                         if ($totalHoursAfterRequest > $attendanceType->max_hours_per_month) {
@@ -303,7 +303,7 @@ class RequestResource extends Resource
                                                             $fail("Monthly hour limit exceeded. You have {$remaining} hours remaining this month.");
                                                         }
                                                     }
-                                                    
+
                                                     if ($attendanceType->max_requests_per_month) {
                                                         $totalRequestsAfterRequest = $usedRequests + 1;
                                                         if ($totalRequestsAfterRequest > $attendanceType->max_requests_per_month) {
@@ -322,7 +322,7 @@ class RequestResource extends Resource
                                     ->label('End Time')
                                     ->seconds(false),
                             ])
-                            ->visible(fn (Forms\Get $get) => $get('request_type') === 'attendance')
+                            ->visible(fn(Forms\Get $get) => $get('request_type') === 'attendance')
                             ->columns(2),
 
                         // Additional Information Section
@@ -338,12 +338,12 @@ class RequestResource extends Resource
                                     ->options(Request::STATUSES)
                                     ->default('pending')
                                     ->required()
-                                    ->visible(fn (string $operation) => $operation === 'edit'),
+                                    ->visible(fn(string $operation) => $operation === 'edit'),
                                 Forms\Components\Textarea::make('admin_notes')
                                     ->label('Admin Notes')
                                     ->placeholder('Admin notes or rejection reason...')
                                     ->rows(3)
-                                    ->visible(fn (string $operation) => $operation === 'edit'),
+                                    ->visible(fn(string $operation) => $operation === 'edit'),
                             ])
                             ->columns(1),
                     ])
@@ -369,7 +369,6 @@ class RequestResource extends Resource
             'index' => Pages\ListRequests::route('/'),
             'create' => Pages\CreateRequest::route('/create'),
             'view' => Pages\ViewRequest::route('/{record}'),
-            'edit' => Pages\EditRequest::route('/{record}/edit'),
         ];
     }
 }

@@ -31,16 +31,16 @@ class ViewRequest extends ViewRecord
                                     ->label('Request Type')
                                     ->badge()
                                     ->color('request_type_color')
-                                    ->formatStateUsing(fn (string $state): string => ucfirst($state)),
+                                    ->formatStateUsing(fn(string $state): string => ucfirst($state)),
                                 Components\TextEntry::make('requestable.name')
-                                    ->label(fn ($record) => $record->isVacation() ? 'Vacation Type' : 'Attendance Type')
+                                    ->label(fn($record) => $record->isVacation() ? 'Vacation Type' : 'Attendance Type')
                                     ->badge()
                                     ->color('primary'),
                                 Components\TextEntry::make('status')
                                     ->label('Status')
                                     ->badge()
                                     ->color('status_color')
-                                    ->formatStateUsing(fn (string $state): string => ucfirst($state)),
+                                    ->formatStateUsing(fn(string $state): string => ucfirst($state)),
                             ])
                             ->columns(2),
 
@@ -60,7 +60,7 @@ class ViewRequest extends ViewRecord
                                     ->suffix(' days')
                                     ->icon('heroicon-o-clock'),
                             ])
-                            ->visible(fn ($record) => $record->isVacation())
+                            ->visible(fn($record) => $record->isVacation())
                             ->columns(2),
 
                         // Attendance Details Section
@@ -83,7 +83,7 @@ class ViewRequest extends ViewRecord
                                     ->time()
                                     ->icon('heroicon-o-stop'),
                             ])
-                            ->visible(fn ($record) => $record->isAttendance())
+                            ->visible(fn($record) => $record->isAttendance())
                             ->columns(2),
 
                         // Additional Information Section
@@ -96,7 +96,7 @@ class ViewRequest extends ViewRecord
                                 Components\TextEntry::make('admin_notes')
                                     ->label('Admin Notes')
                                     ->placeholder('No admin notes')
-                                    ->visible(fn ($record) => filled($record->admin_notes))
+                                    ->visible(fn($record) => filled($record->admin_notes))
                                     ->columnSpanFull(),
                             ])
                             ->columns(1),
@@ -131,9 +131,6 @@ class ViewRequest extends ViewRecord
 
     protected function getHeaderActions(): array
     {
-        return [
-            Actions\EditAction::make()
-                ->icon('heroicon-o-pencil'),
-        ];
+        return [];
     }
 }

@@ -96,17 +96,6 @@ class DocumentResource extends Resource
                     ->label('Download')
                     ->url(fn(Document $record): string => $record->getFirstMediaUrl('documents'))
                     ->openUrlInNewTab(),
-
-                Tables\Actions\Action::make('preview')
-                    ->icon('heroicon-o-eye')
-                    ->label('Preview')
-                    ->visible(fn(Document $record): bool => $record->can_preview)
-                    ->modalContent(function (Document $record) {
-                        if ($record->file_type === 'pdf') {
-                            return view('filament.components.pdf-preview', ['url' => $record->getFirstMediaUrl('documents')]);
-                        }
-                        return null;
-                    }),
             ])
             ->defaultSort('created_at', 'desc')
             ->emptyStateHeading('No documents found')

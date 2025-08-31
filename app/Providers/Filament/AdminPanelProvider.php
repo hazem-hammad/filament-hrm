@@ -37,7 +37,7 @@ class AdminPanelProvider extends PanelProvider
             ->brandLogo(get_setting('logo_light', '/images/logos/logo-light.svg'))
             ->darkModeBrandLogo(get_setting('logo_dark', '/images/logos/logo-dark.svg'))
             ->login()
-            ->darkMode(true, true)
+            ->darkMode(true)
             ->colors([
                 'primary' => get_setting('primary_color', '#23B53D') ?: '#23B53D',
             ])
