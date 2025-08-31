@@ -21,3 +21,4 @@ yarn-error.log
 composer.lock
 /vendor
 tests/Browser/Screenshots
+storage/media-library/temp/*

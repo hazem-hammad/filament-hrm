@@ -73,16 +73,9 @@ class EmployeeResource extends Resource
                                     ->placeholder('Enter employee email')
                                     ->email()
                                     ->required()
-                                    ->maxLength(255),
-                                Forms\Components\TextInput::make('password')
-                                    ->label('Password')
-                                    ->placeholder('Enter employee password')
-                                    ->password()
-                                    ->required(fn(string $operation): bool => $operation === 'create')
                                     ->maxLength(255)
-                                    ->revealable()
-                                    ->dehydrated(fn($state) => filled($state))
-                                    ->helperText('Leave empty to keep current password (edit only)'),
+                                    ->columnSpanFull()
+                                    ->helperText('A welcome email with login credentials will be sent after creation'),
                                 Forms\Components\Textarea::make('address')
                                     ->label('Address')
                                     ->placeholder('Enter employee address')

@@ -14,35 +14,22 @@ class CreateEmployee extends CreateRecord
 
     protected function mutateFormDataBeforeCreate(array $data): array
     {
-        // Generate temporary password
-        $temporaryPassword = Str::random(12);
+        // Generate temporary password (12 characters with mixed case, numbers and symbols)
+        $this->temporaryPassword = Str::password(12, true, true, true, false);
         
-        // Hash the temporary password
-        if (isset($data['password'])) {
-            $data['password'] = Hash::make($temporaryPassword);
-        }
-        
-        // Store the temporary password for email
-        $this->temporaryPassword = $temporaryPassword;
+        // Hash the temporary password for storage
+        $data['password'] = Hash::make($this->temporaryPassword);
+        $data['password_set_at'] = now();
         
         return $data;
     }
 
     protected function afterCreate(): void
     {
-        // Generate password setup token
-        $token = Str::random(64);
-        
-        // Store the token in cache for 24 hours
-        cache()->put("employee_password_setup_{$token}", [
-            'employee_id' => $this->record->id,
-            'created_at' => now()
-        ], now()->addDay());
-        
-        // Send welcome email
+        // Send welcome email with login credentials
         $this->record->notify(new EmployeeWelcomeNotification(
             $this->temporaryPassword,
-            $token
+            ''  // No longer using password setup token
         ));
     }
 
