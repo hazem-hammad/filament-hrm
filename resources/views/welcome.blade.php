@@ -205,33 +205,14 @@
 
     <!-- Centered Logo at Top -->
     <div class="flex justify-center pt-6 pb-2">
-        @if (get_setting('logo_light') || get_setting('logo_dark'))
-            <img src="{{ get_setting('logo_light') ?: get_setting('logo_dark') }}"
-                alt="{{ get_setting('company_name', 'Company Portal') }} Logo"
-                class="h-16 w-auto dark:hidden animate-fade-in-up">
-            @if (get_setting('logo_dark'))
-                <img src="{{ get_setting('logo_dark') }}" alt="{{ get_setting('company_name', 'Company Portal') }} Logo"
-                    class="hidden dark:block h-16 w-auto animate-fade-in-up">
-            @endif
-        @else
-            <div class="flex flex-col items-center animate-fade-in-up">
-                <div
-                    class="flex items-center justify-center w-16 h-16 bg-gradient-to-br from-primary to-primary rounded-xl shadow-primary mb-3">
-                    <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4">
-                        </path>
-                    </svg>
-                </div>
-                <div class="text-center">
-                    <h1
-                        class="text-2xl font-bold bg-gradient-to-r from-primary to-primary bg-clip-text text-transparent">
-                        {{ get_setting('company_name', env('APP_NAME', 'Company Portal')) }}
-                    </h1>
-                    <p class="text-sm text-gray-500 dark:text-gray-400">Company Portal</p>
-                </div>
-            </div>
-        @endif
+        <div class="flex flex-col items-center animate-fade-in-up">
+            <h1
+                class="text-5xl sm:text-6xl lg:text-7xl font-bold text-gray-900 dark:text-white mb-8 leading-tight animate-fade-in-up">
+                <span class="gradient-text block mt-2">
+                    INTCORE
+                </span>
+            </h1>
+        </div>
     </div>
 
     <!-- Session Messages -->
@@ -281,7 +262,7 @@
     @endif
 
     <!-- Hero Section -->
-    <section class="relative overflow-hidden flex items-center justify-center" style="min-height: calc(100vh - 120px);">
+    <section class="relative overflow-hidden flex items-center justify-center" style="min-height: calc(90vh - 100px);">
         <!-- Background Elements -->
         <div class="absolute inset-0 opacity-20">
             <div
