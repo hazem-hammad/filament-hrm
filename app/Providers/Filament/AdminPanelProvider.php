@@ -33,7 +33,7 @@ class AdminPanelProvider extends PanelProvider
             ->path(FilamentPanelID::ADMIN->value)
             ->brandLogoHeight('30px')
             ->favicon('/images/logos/logo-icon-light.svg')
-            ->brandName(get_setting('brand_name', 'Congora'))
+            ->brandName(get_setting('company_name', 'Company'))
             ->brandLogo(get_setting('logo_light', '/images/logos/logo-light.svg'))
             ->darkModeBrandLogo(get_setting('logo_dark', '/images/logos/logo-dark.svg'))
             ->login()

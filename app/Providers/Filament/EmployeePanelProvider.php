@@ -32,7 +32,7 @@ class EmployeePanelProvider extends PanelProvider
             ->viteTheme('resources/css/filament/employee/theme.css')
             ->brandLogoHeight('30px')
             ->favicon('/images/logos/logo-icon-light.svg')
-            ->brandName("HRM")
+            ->brandName(get_setting('company_name', 'Company'))
             ->brandLogo(get_setting('logo_light', '/images/logos/logo-light.svg'))
             ->darkModeBrandLogo(get_setting('logo_dark', '/images/logos/logo-dark.svg'))
             ->login()
