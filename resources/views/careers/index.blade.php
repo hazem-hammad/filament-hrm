@@ -370,12 +370,14 @@
                                         class="w-full rounded-lg border-2 border-gray-200 py-3 pl-4 pr-10 text-gray-700 bg-white appearance-none company-focus company-ring transition-all duration-200 cursor-pointer hover:border-gray-300">
                                         <option value="">Select an Option</option>
                                         <option value="entry"
-                                            {{ request('experience_level') == 'entry' ? 'selected' : '' }}>Entry
+                                            {{ request('experience_level') == 'entry' ? 'selected' : '' }}>Entry Level
                                         </option>
+                                        <option value="junior"
+                                            {{ request('experience_level') == 'junior' ? 'selected' : '' }}>Junior Level</option>
                                         <option value="mid"
-                                            {{ request('experience_level') == 'mid' ? 'selected' : '' }}>Mid</option>
+                                            {{ request('experience_level') == 'mid' ? 'selected' : '' }}>Mid Level</option>
                                         <option value="senior"
-                                            {{ request('experience_level') == 'senior' ? 'selected' : '' }}>Senior
+                                            {{ request('experience_level') == 'senior' ? 'selected' : '' }}>Senior Level
                                         </option>
                                         <option value="lead"
                                             {{ request('experience_level') == 'lead' ? 'selected' : '' }}>Lead</option>
@@ -419,11 +421,11 @@
                                     <select name="work_type" id="work_type"
                                         class="w-full rounded-lg border-2 border-gray-200 py-3 pl-4 pr-10 text-gray-700 bg-white appearance-none company-focus company-ring transition-all duration-200 cursor-pointer hover:border-gray-300">
                                         <option value="">All Types</option>
-                                        <option value="full-time"
-                                            {{ request('work_type') == 'full-time' ? 'selected' : '' }}>Full-time
+                                        <option value="full_time"
+                                            {{ request('work_type') == 'full_time' ? 'selected' : '' }}>Full Time
                                         </option>
-                                        <option value="part-time"
-                                            {{ request('work_type') == 'part-time' ? 'selected' : '' }}>Part-time
+                                        <option value="part_time"
+                                            {{ request('work_type') == 'part_time' ? 'selected' : '' }}>Part Time
                                         </option>
                                         <option value="contract"
                                             {{ request('work_type') == 'contract' ? 'selected' : '' }}>Contract
@@ -537,6 +539,7 @@
                                     @php
                                         $levelColors = [
                                             'entry' => 'bg-blue-50 text-blue-700 border border-blue-200',
+                                            'junior' => 'bg-teal-50 text-teal-700 border border-teal-200',
                                             'mid' => 'bg-green-50 text-green-700 border border-green-200',
                                             'senior' => 'bg-purple-50 text-purple-700 border border-purple-200',
                                             'lead' => 'bg-orange-50 text-orange-700 border border-orange-200',
@@ -544,6 +547,7 @@
 
                                         $levelNames = [
                                             'entry' => 'Entry Level',
+                                            'junior' => 'Junior Level',
                                             'mid' => 'Mid Level',
                                             'senior' => 'Senior Level',
                                             'lead' => 'Lead/Principal',
@@ -566,8 +570,8 @@
                                         ];
 
                                         $workTypeNames = [
-                                            'full_time' => 'Full-time',
-                                            'part_time' => 'Part-time',
+                                            'full_time' => 'Full Time',
+                                            'part_time' => 'Part Time',
                                             'contract' => 'Contract',
                                             'internship' => 'Internship',
                                         ];
@@ -605,7 +609,7 @@
 
                                 <!-- teaser paragraph -->
                                 <p class="text-sm text-gray-600 leading-relaxed line-clamp-2">
-                                    {{ $job->short_description }}
+                                    {{ $job->short_description ?: 'Join our team and help us build amazing products.' }}
                                 </p>
                             </div>
 

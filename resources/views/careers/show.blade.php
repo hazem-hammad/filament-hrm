@@ -110,7 +110,7 @@
                 <div class="relative">
                     <h1
                         class="text-2xl sm:text-2xl lg:text-4xl xl:text-4xl font-bold text-white mb-3 lg:mb-4 tracking-tight">
-                        {{ $job['title'] ?? 'Frontend Developer' }}
+                        {{ $job->title }}
                     </h1>
                 </div>
 
@@ -123,17 +123,17 @@
                                 d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                         </svg>
                         <span
-                            class="font-semibold text-xs sm:text-sm lg:text-base">{{ \Illuminate\Support\Str::title(str_replace(['-', '_'], ' ', $job['work_type'])) }}</span>
+                            class="font-semibold text-xs sm:text-sm lg:text-base">{{ \Illuminate\Support\Str::title(str_replace(['_'], ' ', $job->work_type)) }}</span>
                     </div>
                     <div
                         class="flex items-center gap-1.5 sm:gap-2 bg-white/10 backdrop-blur-sm rounded-full px-3 py-2 sm:px-4 sm:py-2.5 lg:px-6 lg:py-3 border border-white/20">
-                        @if (strtolower($job['work_mode']) === 'remote')
+                        @if (strtolower($job->work_mode) === 'remote')
                             <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6">
                                 </path>
                             </svg>
-                        @elseif(strtolower($job['work_mode']) === 'hybrid')
+                        @elseif(strtolower($job->work_mode) === 'hybrid')
                             <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z">
@@ -147,7 +147,7 @@
                             </svg>
                         @endif
                         <span
-                            class="font-semibold text-xs sm:text-sm lg:text-base">{{ \Illuminate\Support\Str::title(str_replace(['-', '_'], ' ', $job['work_mode'])) }}</span>
+                            class="font-semibold text-xs sm:text-sm lg:text-base">{{ \Illuminate\Support\Str::title(str_replace(['_'], ' ', $job->work_mode)) }}</span>
                     </div>
                 </div>
             </div>
@@ -174,12 +174,9 @@
                             Job Description
                         </h3>
                         <div class="prose prose-gray max-w-none">
-                            <p class="text-gray-600 leading-relaxed mb-4">
-                                {!! $job['description'] !!}
-                            </p>
-                            <p class="text-gray-600 leading-relaxed">
-                                {!! $job['description'] !!}
-                            </p>
+                            <div class="text-gray-600 leading-relaxed">
+                                {!! $job->long_description ?? $job->short_description ?? 'This is an exciting opportunity to join our team and contribute to innovative projects.' !!}
+                            </div>
                         </div>
                     </div>
 
@@ -194,9 +191,11 @@
                             </svg>
                             Requirements
                         </h3>
-                        <ul class="space-y-3">
-                            {!! $job['requirement'] !!}
-                        </ul>
+                        <div class="prose prose-gray max-w-none">
+                            <div class="text-gray-600 leading-relaxed">
+                                {!! $job->job_requirements ?? '<ul class="list-disc ml-5"><li>Bachelor\'s degree or equivalent experience</li><li>Strong communication skills</li><li>Problem-solving ability</li><li>Team collaboration</li></ul>' !!}
+                            </div>
+                        </div>
                     </div>
 
                     <!-- Benefits -->
@@ -210,8 +209,10 @@
                             </svg>
                             What We Offer
                         </h3>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            {!! $job['what_we_offer'] !!}
+                        <div class="prose prose-gray max-w-none">
+                            <div class="text-gray-600 leading-relaxed">
+                                {!! $job->benefits ?? '<ul class="grid grid-cols-1 md:grid-cols-2 gap-2 list-disc ml-5"><li>Competitive salary</li><li>Health insurance</li><li>Flexible working hours</li><li>Professional development</li><li>Team events</li><li>Modern equipment</li></ul>' !!}
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -294,19 +295,18 @@
 
                             <!-- Experience -->
                             <div>
-                                <label for="experience_years"
+                                <label for="years_of_experience"
                                     class="block text-sm font-medium text-gray-700 mb-2">Years of Experience *</label>
-                                <select id="experience_years" name="experience_years" required
+                                <select id="years_of_experience" name="years_of_experience" required
                                     class="w-full px-4 py-3 border border-gray-300 rounded-lg company-focus company-ring transition-all duration-200">
                                     <option value="">Select your experience years</option>
-                                    <option value="0">
-                                        < 1 year</option>
+                                    <option value="0">< 1 year</option>
                                     <option value="1">1 year</option>
                                     <option value="2">2 years</option>
                                     <option value="3">3 years</option>
                                     <option value="4">4 years</option>
                                     <option value="5">5 years</option>
-                                    <option value="6">6 years</option>
+                                    <option value="6">6+ years</option>
                                 </select>
                             </div>
 
@@ -315,30 +315,122 @@
                                 <label for="resume" class="block text-sm font-medium text-gray-700 mb-2">Resume/CV
                                     *</label>
                                 <div class="relative">
-                                    <input type="file" id="resume" name="resume" accept=".pdf,.doc,.docx"
+                                    <input type="file" id="resume" name="resume" accept=".pdf,.doc,.docx,.xlsx,.xls,.jpg,.jpeg,.png,.gif,.txt,.csv"
                                         required
                                         class="w-full px-4 py-3 border border-gray-300 rounded-lg company-focus company-ring transition-all duration-200 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:company-bg file:text-white file:font-medium file:hover:company-bg-hover">
                                 </div>
-                                <p class="mt-1 text-xs text-gray-500">PDF, DOC, or DOCX (max 5MB)</p>
+                                <p class="mt-1 text-xs text-gray-500">PDF, DOC, DOCX, XLSX, XLS, JPG, PNG, TXT, CSV (max 5MB)</p>
                             </div>
 
                             <!-- LinkedIn -->
                             <div>
-                                <label for="linkedin" class="block text-sm font-medium text-gray-700 mb-2">LinkedIn
+                                <label for="linkedin_url" class="block text-sm font-medium text-gray-700 mb-2">LinkedIn
                                     Profile</label>
-                                <input type="url" id="linkedin" name="linkedin"
+                                <input type="url" id="linkedin_url" name="linkedin_url"
                                     placeholder="https://linkedin.com/in/yourprofile"
                                     class="w-full px-4 py-3 border border-gray-300 rounded-lg company-focus company-ring transition-all duration-200">
                             </div>
 
                             <!-- Portfolio -->
                             <div>
-                                <label for="portfolio"
-                                    class="block text-sm font-medium text-gray-700 mb-2">Portfolio/GitHub</label>
-                                <input type="url" id="portfolio" name="portfolio"
+                                <label for="portfolio_url"
+                                    class="block text-sm font-medium text-gray-700 mb-2">Portfolio URL</label>
+                                <input type="url" id="portfolio_url" name="portfolio_url"
+                                    placeholder="https://yourportfolio.com"
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg company-focus company-ring transition-all duration-200">
+                            </div>
+
+                            <!-- GitHub -->
+                            <div>
+                                <label for="github_url"
+                                    class="block text-sm font-medium text-gray-700 mb-2">GitHub Profile</label>
+                                <input type="url" id="github_url" name="github_url"
                                     placeholder="https://github.com/yourusername"
                                     class="w-full px-4 py-3 border border-gray-300 rounded-lg company-focus company-ring transition-all duration-200">
                             </div>
+
+                            <!-- Custom Questions -->
+                            @if($job->customQuestions && $job->customQuestions->count() > 0)
+                                <div class="border-t border-gray-200 pt-6 mt-6">
+                                    <h4 class="text-lg font-semibold text-gray-900 mb-4">Additional Questions</h4>
+                                    @foreach($job->customQuestions as $question)
+                                        <div class="mb-6">
+                                            <label for="custom_question_{{ $question->id }}" 
+                                                class="block text-sm font-medium text-gray-700 mb-2">
+                                                {{ $question->title }}
+                                                @if($question->is_required) <span class="text-red-500">*</span> @endif
+                                            </label>
+
+                                            @switch($question->type)
+                                                @case('text_field')
+                                                    <input type="text" 
+                                                        id="custom_question_{{ $question->id }}" 
+                                                        name="custom_questions[{{ $question->id }}]"
+                                                        @if($question->is_required) required @endif
+                                                        class="w-full px-4 py-3 border border-gray-300 rounded-lg company-focus company-ring transition-all duration-200">
+                                                    @break
+
+                                                @case('textarea')
+                                                    <textarea 
+                                                        id="custom_question_{{ $question->id }}" 
+                                                        name="custom_questions[{{ $question->id }}]"
+                                                        rows="4"
+                                                        @if($question->is_required) required @endif
+                                                        class="w-full px-4 py-3 border border-gray-300 rounded-lg company-focus company-ring transition-all duration-200"></textarea>
+                                                    @break
+
+                                                @case('date')
+                                                    <input type="date" 
+                                                        id="custom_question_{{ $question->id }}" 
+                                                        name="custom_questions[{{ $question->id }}]"
+                                                        @if($question->is_required) required @endif
+                                                        class="w-full px-4 py-3 border border-gray-300 rounded-lg company-focus company-ring transition-all duration-200">
+                                                    @break
+
+                                                @case('file_upload')
+                                                    <input type="file" 
+                                                        id="custom_question_{{ $question->id }}" 
+                                                        name="custom_questions[{{ $question->id }}]"
+                                                        @if($question->is_required) required @endif
+                                                        class="w-full px-4 py-3 border border-gray-300 rounded-lg company-focus company-ring transition-all duration-200 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:company-bg file:text-white file:font-medium file:hover:company-bg-hover">
+                                                    @break
+
+                                                @case('toggle')
+                                                    <div class="flex items-center">
+                                                        <input type="hidden" name="custom_questions[{{ $question->id }}]" value="0">
+                                                        <input type="checkbox" 
+                                                            id="custom_question_{{ $question->id }}" 
+                                                            name="custom_questions[{{ $question->id }}]"
+                                                            value="1"
+                                                            @if($question->is_required) required @endif
+                                                            class="h-4 w-4 company-text focus:company-ring border-gray-300 rounded">
+                                                        <label for="custom_question_{{ $question->id }}" 
+                                                            class="ml-2 block text-sm text-gray-700">Yes</label>
+                                                    </div>
+                                                    @break
+
+                                                @case('multi_select')
+                                                    @if($question->options && is_array($question->options))
+                                                        <div class="space-y-2">
+                                                            @foreach($question->options as $option)
+                                                                <div class="flex items-center">
+                                                                    <input type="checkbox" 
+                                                                        id="custom_question_{{ $question->id }}_{{ $loop->index }}" 
+                                                                        name="custom_questions[{{ $question->id }}][]"
+                                                                        value="{{ $option }}"
+                                                                        class="h-4 w-4 company-text focus:company-ring border-gray-300 rounded">
+                                                                    <label for="custom_question_{{ $question->id }}_{{ $loop->index }}" 
+                                                                        class="ml-2 block text-sm text-gray-700">{{ $option }}</label>
+                                                                </div>
+                                                            @endforeach
+                                                        </div>
+                                                    @endif
+                                                    @break
+                                            @endswitch
+                                        </div>
+                                    @endforeach
+                                </div>
+                            @endif
 
                             <!-- Submit Button -->
                             <button type="submit" id="submitBtn"
@@ -570,8 +662,18 @@
                 const file = this.files[0];
                 if (file) {
                     const maxSize = 5 * 1024 * 1024; // 5MB
-                    const allowedTypes = ['application/pdf', 'application/msword',
-                        'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+                    const allowedTypes = [
+                        'application/pdf', 
+                        'application/msword',
+                        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', // Excel .xlsx
+                        'application/vnd.ms-excel', // Excel .xls
+                        'image/jpeg',
+                        'image/jpg', 
+                        'image/png',
+                        'image/gif',
+                        'text/plain',
+                        'text/csv'
                     ];
 
                     if (file.size > maxSize) {
@@ -581,7 +683,7 @@
                     }
 
                     if (!allowedTypes.includes(file.type)) {
-                        alert('Only PDF, DOC, and DOCX files are allowed');
+                        alert('Only PDF, DOC, DOCX, XLSX, XLS, JPG, PNG, GIF, TXT, and CSV files are allowed');
                         this.value = '';
                         return;
                     }

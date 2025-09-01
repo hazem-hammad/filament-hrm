@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\JobApplicationResource\Pages;
 use App\Filament\Resources\JobApplicationResource\RelationManagers;
 use App\Models\JobApplication;
+use Carbon\Carbon;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Infolists;
@@ -182,7 +183,73 @@ class JobApplicationResource extends Resource
 
     public static function table(Table $table): Table
     {
-        return $table;
+        return $table
+            ->columns([
+                Tables\Columns\TextColumn::make('job.title')
+                    ->label('Job Position')
+                    ->searchable()
+                    ->sortable()
+                    ->badge()
+                    ->color('primary'),
+                Tables\Columns\TextColumn::make('full_name')
+                    ->label('Applicant')
+                    ->getStateUsing(fn($record) => $record->first_name . ' ' . $record->last_name)
+                    ->searchable(['first_name', 'last_name'])
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('email')
+                    ->searchable()
+                    ->copyable()
+                    ->icon('heroicon-o-envelope'),
+                Tables\Columns\TextColumn::make('phone')
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('years_of_experience')
+                    ->label('Experience')
+                    ->suffix(' yrs')
+                    ->alignCenter()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('jobStage.name')
+                    ->label('Stage')
+                    ->badge()
+                    ->color('success'),
+                Tables\Columns\IconColumn::make('status')
+                    ->boolean()
+                    ->label('Active')
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('created_at')
+                    ->label('Applied')
+                    ->dateTime('M d, Y')
+                    ->sortable(),
+            ])
+            ->filters([
+                Tables\Filters\SelectFilter::make('job_id')
+                    ->label('Job Position')
+                    ->relationship('job', 'title')
+                    ->searchable()
+                    ->preload(),
+                Tables\Filters\SelectFilter::make('job_stage_id')
+                    ->label('Stage')
+                    ->relationship('jobStage', 'name')
+                    ->searchable()
+                    ->preload(),
+                Tables\Filters\TernaryFilter::make('status')
+                    ->label('Status')
+                    ->boolean()
+                    ->trueLabel('Active')
+                    ->falseLabel('Inactive')
+                    ->native(false),
+            ])
+            ->actions([
+                Tables\Actions\ViewAction::make(),
+                Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
+            ])
+            ->bulkActions([
+                Tables\Actions\BulkActionGroup::make([
+                    Tables\Actions\DeleteBulkAction::make(),
+                ]),
+            ])
+            ->defaultSort('created_at', 'desc');
     }
 
     public static function infolist(Infolist $infolist): Infolist
@@ -260,6 +327,37 @@ class JobApplicationResource extends Resource
                     ->columns(1)
                     ->collapsible(),
 
+                // Resume & Files
+                Infolists\Components\Section::make('Resume & Documents')
+                    ->schema(function (JobApplication $record) {
+                        $schema = [];
+                        
+                        // Display resume if exists
+                        $resumeMedia = $record->getFirstMedia('resume');
+                        if ($resumeMedia) {
+                            $schema[] = Infolists\Components\TextEntry::make('resume')
+                                ->label('Resume/CV')
+                                ->state(function () use ($resumeMedia) {
+                                    return '<a href="' . $resumeMedia->getUrl() . '" target="_blank" class="text-primary-600 hover:text-primary-500 font-medium flex items-center gap-2">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3M3 17V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2z"></path>
+                                        </svg>
+                                        ' . $resumeMedia->name . ' (' . $resumeMedia->human_readable_size . ')
+                                    </a>';
+                                })
+                                ->html();
+                        } else {
+                            $schema[] = Infolists\Components\TextEntry::make('resume')
+                                ->label('Resume/CV')
+                                ->state('No resume uploaded')
+                                ->color('gray');
+                        }
+
+                        return $schema;
+                    })
+                    ->columns(1)
+                    ->collapsible(),
+
                 // Custom Question Answers
                 Infolists\Components\Section::make('Application Answers')
                     ->schema(function (JobApplication $record) {
@@ -280,18 +378,54 @@ class JobApplicationResource extends Resource
                             $value = $answer->answer;
 
                             // Handle different question types
-                            if ($question->type === 'multi_select') {
+                            if ($question->type === 'file_upload') {
+                                // For file uploads, the answer contains the media ID
+                                $mediaId = $value;
+                                $media = $record->getMedia('custom_questions')->where('id', $mediaId)->first();
+                                
+                                if ($media) {
+                                    $fields[] = Infolists\Components\TextEntry::make("answer_{$answer->id}")
+                                        ->label($question->title)
+                                        ->state(function () use ($media) {
+                                            return '<a href="' . $media->getUrl() . '" target="_blank" class="text-primary-600 hover:text-primary-500 font-medium flex items-center gap-2">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path>
+                                                </svg>
+                                                ' . $media->name . ' (' . $media->human_readable_size . ')
+                                            </a>';
+                                        })
+                                        ->html();
+                                } else {
+                                    $fields[] = Infolists\Components\TextEntry::make("answer_{$answer->id}")
+                                        ->label($question->title)
+                                        ->state('File not found')
+                                        ->color('danger');
+                                }
+                            } elseif ($question->type === 'multi_select') {
                                 $decoded = json_decode($value, true);
                                 $value = is_array($decoded) ? implode(', ', $decoded) : $value;
+                                $fields[] = Infolists\Components\TextEntry::make("answer_{$answer->id}")
+                                    ->label($question->title)
+                                    ->state($value)
+                                    ->badge();
                             } elseif ($question->type === 'toggle') {
                                 $value = $value ? 'Yes' : 'No';
+                                $fields[] = Infolists\Components\TextEntry::make("answer_{$answer->id}")
+                                    ->label($question->title)
+                                    ->state($value)
+                                    ->badge()
+                                    ->color($value === 'Yes' ? 'success' : 'gray');
+                            } elseif ($question->type === 'date') {
+                                $fields[] = Infolists\Components\TextEntry::make("answer_{$answer->id}")
+                                    ->label($question->title)
+                                    ->state($value ? Carbon::parse($value)->format('M d, Y') : 'Not provided');
+                            } else {
+                                // Text field, textarea, and other types
+                                $fields[] = Infolists\Components\TextEntry::make("answer_{$answer->id}")
+                                    ->label($question->title)
+                                    ->state($value ?: 'Not provided')
+                                    ->html($question->type === 'textarea');
                             }
-
-                            $fields[] = Infolists\Components\TextEntry::make("answer_{$answer->id}")
-                                ->label($question->title)
-                                ->state($value)
-                                ->badge($question->type === 'multi_select')
-                                ->html($question->type === 'textarea');
                         }
 
                         return $fields;
