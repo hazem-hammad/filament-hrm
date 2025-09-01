@@ -4,15 +4,16 @@ namespace App\Filament\Resources\EmployeeResource\Pages;
 
 use App\Enum\EmployeeLevel;
 use App\Filament\Resources\EmployeeResource;
-use App\Filament\Widgets\EmployeeStatsWidget;
+use App\Imports\EmployeeImport;
 use App\Models\Employee;
-use App\Models\Department;
 use Filament\Actions;
+use Filament\Forms\Components\FileUpload;
+use Filament\Notifications\Notification;
 use Filament\Resources\Pages\ListRecords;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Filament\Widgets\StatsOverviewWidget\Card;
 use Illuminate\Database\Eloquent\Builder;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ListEmployees extends ListRecords
 {
@@ -270,6 +271,139 @@ class ListEmployees extends ListRecords
         return [
             Actions\CreateAction::make()
                 ->icon('heroicon-o-plus'),
+            Actions\Action::make('import')
+                ->label('Import Employees')
+                ->icon('heroicon-o-arrow-up-tray')
+                ->color('info')
+                ->form([
+                    \Filament\Forms\Components\Section::make('Import Instructions')
+                        ->description('Follow these steps to import employees successfully')
+                        ->schema([
+                            \Filament\Forms\Components\Placeholder::make('instructions')
+                                ->content(new \Illuminate\Support\HtmlString('
+                                    <div class="space-y-4">
+                                        <div class="bg-blue-50 p-3 rounded-lg border border-blue-200">
+                                            <p class="text-sm text-blue-800">
+                                                <strong>💡 Tip:</strong> Download the template below for proper formatting and sample data.
+                                            </p>
+                                        </div>
+                                    </div>
+                                '))
+                                ->columnSpanFull(),
+                            \Filament\Forms\Components\Actions::make([
+                                \Filament\Forms\Components\Actions\Action::make('download_template')
+                                    ->label('Download Template')
+                                    ->icon('heroicon-o-arrow-down-tray')
+                                    ->color('success')
+                                    ->action(function () {
+                                        return response()->download(
+                                            public_path('samples/imports/employee_import_template.xlsx'),
+                                            'employee_import_template.xlsx'
+                                        );
+                                    })
+                            ])->columnSpanFull(),
+                        ])->collapsible(),
+                    FileUpload::make('file')
+                        ->label('Excel File')
+                        ->acceptedFileTypes([
+                            'application/vnd.ms-excel',
+                            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                            'text/csv',
+                            'application/csv'
+                        ])
+                        ->required()
+                        ->helperText('Upload an Excel file (.xlsx, .xls) or CSV file with employee data')
+                        ->columnSpanFull()
+                ])
+                ->action(function (array $data): void {
+                    // Get the uploaded file path
+                    $uploadedFile = $data['file'];
+                    
+                    // Try multiple possible paths
+                    $possiblePaths = [
+                        storage_path('app/' . $uploadedFile),                    // storage/app/imports/file.xlsx
+                        storage_path('app/public/' . $uploadedFile),             // storage/app/public/imports/file.xlsx
+                        storage_path('app/livewire-tmp/' . $uploadedFile),       // Livewire temp directory
+                        storage_path('app/livewire-tmp/' . basename($uploadedFile)), // Just filename in livewire-tmp
+                        $uploadedFile,                                           // Direct path if absolute
+                    ];
+                    
+                    $filePath = null;
+                    foreach ($possiblePaths as $path) {
+                        if (file_exists($path)) {
+                            $filePath = $path;
+                            break;
+                        }
+                    }
+                    
+                    if (!$filePath) {
+                        // Debug: List what's actually in the directories
+                        $debugInfo = [];
+                        $debugDirs = [
+                            'storage/app' => storage_path('app'),
+                            'storage/app/imports' => storage_path('app/imports'),
+                            'storage/app/public' => storage_path('app/public'),
+                            'storage/app/livewire-tmp' => storage_path('app/livewire-tmp'),
+                        ];
+                        
+                        foreach ($debugDirs as $label => $dir) {
+                            if (is_dir($dir)) {
+                                $files = array_slice(scandir($dir), 2, 5); // Skip . and .., take first 5
+                                $debugInfo[] = $label . ': ' . implode(', ', $files);
+                            }
+                        }
+                        
+                        Notification::make()
+                            ->title('Import Failed')
+                            ->body('File not found. Searched: ' . $uploadedFile . '. Found in dirs: ' . implode(' | ', $debugInfo))
+                            ->danger()
+                            ->send();
+                        return;
+                    }
+
+                    try {
+                        $import = new EmployeeImport();
+                        Excel::import($import, $filePath);
+
+                        $importedCount = $import->getImportedCount();
+                        $errors = $import->getErrors();
+
+                        if ($importedCount > 0) {
+                            Notification::make()
+                                ->title('Import Successful')
+                                ->body("Successfully imported {$importedCount} employees. Welcome emails will be sent shortly.")
+                                ->success()
+                                ->send();
+                        }
+
+                        if (!empty($errors)) {
+                            Notification::make()
+                                ->title('Import Completed with Errors')
+                                ->body('Some rows had errors: ' . implode(', ', array_slice($errors, 0, 3)) . (count($errors) > 3 ? '... and ' . (count($errors) - 3) . ' more' : ''))
+                                ->warning()
+                                ->send();
+                        }
+                        
+                        if ($importedCount === 0 && empty($errors)) {
+                            Notification::make()
+                                ->title('Import Warning')
+                                ->body('No data was found in the uploaded file. Please check the file format and ensure it contains employee data.')
+                                ->warning()
+                                ->send();
+                        }
+                    } catch (\Exception $e) {
+                        Notification::make()
+                            ->title('Import Failed')
+                            ->body('Error: ' . $e->getMessage())
+                            ->danger()
+                            ->send();
+                    } finally {
+                        // Clean up the uploaded file
+                        if (file_exists($filePath)) {
+                            unlink($filePath);
+                        }
+                    }
+                })
         ];
     }
 }
