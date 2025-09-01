@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\SecureJobApplicationRequest;
 use App\Models\Job;
 use App\Models\Setting;
 use App\Models\JobApplication;
@@ -63,7 +64,7 @@ class CareerController extends Controller
         ]);
     }
 
-    public function apply(Request $request, $slug)
+    public function apply(SecureJobApplicationRequest $request, $slug)
     {
         // Find the job with custom questions
         $job = Job::where('slug', $slug)->with('customQuestions')->first();
@@ -75,77 +76,22 @@ class CareerController extends Controller
             ], 404);
         }
 
-        // Build validation rules
-        $rules = [
-            'first_name' => 'required|string|max:255',
-            'last_name' => 'required|string|max:255',
-            'email' => 'required|email|max:255',
-            'phone' => 'required|string|max:20',
-            'years_of_experience' => 'required|integer|min:0',
-            'resume' => 'required|file|mimes:pdf,doc,docx,xlsx,xls,jpg,jpeg,png,gif,txt,csv|max:5120', // 5MB max
-            'linkedin_url' => 'nullable|url|max:255',
-            'portfolio_url' => 'nullable|url|max:255',
-            'github_url' => 'nullable|url|max:255',
-        ];
-
-        // Add validation for custom questions if they exist
+        // Get sanitized data from secure form request
+        $data = $request->sanitized();
         $customQuestions = $job->customQuestions;
-        if ($customQuestions) {
-            foreach ($customQuestions as $question) {
-                $fieldName = "custom_questions.{$question->id}";
-                $fieldRules = [];
-                
-                if ($question->is_required) {
-                    $fieldRules[] = 'required';
-                }
-
-                switch ($question->type) {
-                    case 'text_field':
-                    case 'textarea':
-                        $fieldRules[] = 'string|max:2000';
-                        break;
-                    case 'date':
-                        $fieldRules[] = 'date';
-                        break;
-                    case 'file_upload':
-                        $fieldRules[] = 'file|mimes:pdf,doc,docx,xlsx,xls,jpg,jpeg,png,gif,txt,csv|max:5120'; // 5MB max
-                        break;
-                    case 'toggle':
-                        $fieldRules[] = 'boolean';
-                        break;
-                    case 'multi_select':
-                        $fieldRules[] = 'array';
-                        break;
-                }
-
-                if (!empty($fieldRules)) {
-                    $rules[$fieldName] = implode('|', $fieldRules);
-                }
-            }
-        }
-
-        $validator = Validator::make($request->all(), $rules);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Validation failed',
-                'errors' => $validator->errors()
-            ], 422);
-        }
 
         try {
             // Create job application
             $application = JobApplication::create([
                 'job_id' => $job->id,
-                'first_name' => $request->first_name,
-                'last_name' => $request->last_name,
-                'email' => $request->email,
-                'phone' => $request->phone,
-                'linkedin_url' => $request->linkedin_url,
-                'portfolio_url' => $request->portfolio_url,
-                'github_url' => $request->github_url,
-                'years_of_experience' => $request->years_of_experience,
+                'first_name' => $data['first_name'],
+                'last_name' => $data['last_name'],
+                'email' => $data['email'],
+                'phone' => $data['phone'],
+                'linkedin_url' => $data['linkedin_url'] ?? null,
+                'portfolio_url' => $data['portfolio_url'] ?? null,
+                'github_url' => $data['github_url'] ?? null,
+                'years_of_experience' => $data['years_of_experience'],
                 'status' => true,
             ]);
 

@@ -20,6 +20,7 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->prependToGroup('api', \App\Http\Middleware\MaintenanceModeMiddleware::class);
+        $middleware->appendToGroup('api', \App\Http\Middleware\ApiSecurityMiddleware::class);
         $middleware->appendToGroup('api', \App\Http\Middleware\ApiKeyMiddleware::class);
         $middleware->appendToGroup('api', \App\Http\Middleware\EnsureUserActive::class);
         $middleware->appendToGroup('api', 'throttle:global');
@@ -27,6 +28,10 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'is_user_active' => \App\Http\Middleware\EnsureUserActive::class,
             'is_verified' => \App\Http\Middleware\EnsureEmailIsVerifiedForApi::class,
+            'rate_limit' => \App\Http\Middleware\SecurityRateLimitMiddleware::class,
+            'recaptcha' => \App\Http\Middleware\RecaptchaMiddleware::class,
+            'enhanced_csrf' => \App\Http\Middleware\EnhancedCsrfProtection::class,
+            'api_security' => \App\Http\Middleware\ApiSecurityMiddleware::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

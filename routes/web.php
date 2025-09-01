@@ -21,7 +21,9 @@ Route::get('/careers', [CareerController::class, 'index'])->name('jobs.index');
 // dynamic route for each career
 Route::get('/careers/{slug}', [CareerController::class, 'show'])->name('jobs.show');
 // route for job application submission
-Route::post('/careers/{slug}/apply', [CareerController::class, 'apply'])->name('job.apply');
+Route::post('/careers/{slug}/apply', [CareerController::class, 'apply'])
+    ->middleware(['enhanced_csrf', 'rate_limit:job_application', 'recaptcha'])
+    ->name('job.apply');
 
 // Employee attendance duration API for real-time updates
 Route::middleware(['auth:employee'])->group(function () {

@@ -38,7 +38,16 @@
             border-color: var(--company-color);
         }
     </style>
-    <title>{{ $job['title'] ?? 'Job Position' }} – {{ $companyName }}</title>
+    <title>{{ $job->title }} – {{ $companyName }}</title>
+
+    <!-- reCAPTCHA Scripts -->
+    @if (config('recaptcha.enabled'))
+        @if (config('recaptcha.version') === 'v2')
+            <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+        @else
+            <script src="https://www.google.com/recaptcha/api.js?render={{ config('recaptcha.site_key') }}"></script>
+        @endif
+    @endif
 </head>
 
 <body class="antialiased font-sans text-gray-700 bg-gray-100">
@@ -175,7 +184,9 @@
                         </h3>
                         <div class="prose prose-gray max-w-none">
                             <div class="text-gray-600 leading-relaxed">
-                                {!! $job->long_description ?? $job->short_description ?? 'This is an exciting opportunity to join our team and contribute to innovative projects.' !!}
+                                {!! $job->long_description ??
+                                    ($job->short_description ??
+                                        'This is an exciting opportunity to join our team and contribute to innovative projects.') !!}
                             </div>
                         </div>
                     </div>
@@ -193,7 +204,8 @@
                         </h3>
                         <div class="prose prose-gray max-w-none">
                             <div class="text-gray-600 leading-relaxed">
-                                {!! $job->job_requirements ?? '<ul class="list-disc ml-5"><li>Bachelor\'s degree or equivalent experience</li><li>Strong communication skills</li><li>Problem-solving ability</li><li>Team collaboration</li></ul>' !!}
+                                {!! $job->job_requirements ??
+                                    '<ul class="list-disc ml-5"><li>Bachelor\'s degree or equivalent experience</li><li>Strong communication skills</li><li>Problem-solving ability</li><li>Team collaboration</li></ul>' !!}
                             </div>
                         </div>
                     </div>
@@ -211,7 +223,8 @@
                         </h3>
                         <div class="prose prose-gray max-w-none">
                             <div class="text-gray-600 leading-relaxed">
-                                {!! $job->benefits ?? '<ul class="grid grid-cols-1 md:grid-cols-2 gap-2 list-disc ml-5"><li>Competitive salary</li><li>Health insurance</li><li>Flexible working hours</li><li>Professional development</li><li>Team events</li><li>Modern equipment</li></ul>' !!}
+                                {!! $job->benefits ??
+                                    '<ul class="grid grid-cols-1 md:grid-cols-2 gap-2 list-disc ml-5"><li>Competitive salary</li><li>Health insurance</li><li>Flexible working hours</li><li>Professional development</li><li>Team events</li><li>Modern equipment</li></ul>' !!}
                             </div>
                         </div>
                     </div>
@@ -300,7 +313,8 @@
                                 <select id="years_of_experience" name="years_of_experience" required
                                     class="w-full px-4 py-3 border border-gray-300 rounded-lg company-focus company-ring transition-all duration-200">
                                     <option value="">Select your experience years</option>
-                                    <option value="0">< 1 year</option>
+                                    <option value="0">
+                                        < 1 year</option>
                                     <option value="1">1 year</option>
                                     <option value="2">2 years</option>
                                     <option value="3">3 years</option>
@@ -315,16 +329,18 @@
                                 <label for="resume" class="block text-sm font-medium text-gray-700 mb-2">Resume/CV
                                     *</label>
                                 <div class="relative">
-                                    <input type="file" id="resume" name="resume" accept=".pdf,.doc,.docx,.xlsx,.xls,.jpg,.jpeg,.png,.gif,.txt,.csv"
-                                        required
+                                    <input type="file" id="resume" name="resume"
+                                        accept=".pdf,.doc,.docx,.xlsx,.xls,.jpg,.jpeg,.png,.gif,.txt,.csv" required
                                         class="w-full px-4 py-3 border border-gray-300 rounded-lg company-focus company-ring transition-all duration-200 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:company-bg file:text-white file:font-medium file:hover:company-bg-hover">
                                 </div>
-                                <p class="mt-1 text-xs text-gray-500">PDF, DOC, DOCX, XLSX, XLS, JPG, PNG, TXT, CSV (max 5MB)</p>
+                                <p class="mt-1 text-xs text-gray-500">PDF, DOC, DOCX, XLSX, XLS, JPG, PNG, TXT, CSV
+                                    (max 5MB)</p>
                             </div>
 
                             <!-- LinkedIn -->
                             <div>
-                                <label for="linkedin_url" class="block text-sm font-medium text-gray-700 mb-2">LinkedIn
+                                <label for="linkedin_url"
+                                    class="block text-sm font-medium text-gray-700 mb-2">LinkedIn
                                     Profile</label>
                                 <input type="url" id="linkedin_url" name="linkedin_url"
                                     placeholder="https://linkedin.com/in/yourprofile"
@@ -342,93 +358,121 @@
 
                             <!-- GitHub -->
                             <div>
-                                <label for="github_url"
-                                    class="block text-sm font-medium text-gray-700 mb-2">GitHub Profile</label>
+                                <label for="github_url" class="block text-sm font-medium text-gray-700 mb-2">GitHub
+                                    Profile</label>
                                 <input type="url" id="github_url" name="github_url"
                                     placeholder="https://github.com/yourusername"
                                     class="w-full px-4 py-3 border border-gray-300 rounded-lg company-focus company-ring transition-all duration-200">
                             </div>
 
                             <!-- Custom Questions -->
-                            @if($job->customQuestions && $job->customQuestions->count() > 0)
+                            @if ($job->customQuestions && $job->customQuestions->count() > 0)
                                 <div class="border-t border-gray-200 pt-6 mt-6">
                                     <h4 class="text-lg font-semibold text-gray-900 mb-4">Additional Questions</h4>
-                                    @foreach($job->customQuestions as $question)
+                                    @foreach ($job->customQuestions as $question)
                                         <div class="mb-6">
-                                            <label for="custom_question_{{ $question->id }}" 
+                                            <label for="custom_question_{{ $question->id }}"
                                                 class="block text-sm font-medium text-gray-700 mb-2">
                                                 {{ $question->title }}
-                                                @if($question->is_required) <span class="text-red-500">*</span> @endif
+                                                @if ($question->is_required)
+                                                    <span class="text-red-500">*</span>
+                                                @endif
                                             </label>
 
                                             @switch($question->type)
                                                 @case('text_field')
-                                                    <input type="text" 
-                                                        id="custom_question_{{ $question->id }}" 
+                                                    <input type="text" id="custom_question_{{ $question->id }}"
                                                         name="custom_questions[{{ $question->id }}]"
-                                                        @if($question->is_required) required @endif
+                                                        @if ($question->is_required) required @endif
                                                         class="w-full px-4 py-3 border border-gray-300 rounded-lg company-focus company-ring transition-all duration-200">
-                                                    @break
+                                                @break
 
                                                 @case('textarea')
-                                                    <textarea 
-                                                        id="custom_question_{{ $question->id }}" 
-                                                        name="custom_questions[{{ $question->id }}]"
-                                                        rows="4"
-                                                        @if($question->is_required) required @endif
+                                                    <textarea id="custom_question_{{ $question->id }}" name="custom_questions[{{ $question->id }}]" rows="4"
+                                                        @if ($question->is_required) required @endif
                                                         class="w-full px-4 py-3 border border-gray-300 rounded-lg company-focus company-ring transition-all duration-200"></textarea>
-                                                    @break
+                                                @break
 
                                                 @case('date')
-                                                    <input type="date" 
-                                                        id="custom_question_{{ $question->id }}" 
+                                                    <input type="date" id="custom_question_{{ $question->id }}"
                                                         name="custom_questions[{{ $question->id }}]"
-                                                        @if($question->is_required) required @endif
+                                                        @if ($question->is_required) required @endif
                                                         class="w-full px-4 py-3 border border-gray-300 rounded-lg company-focus company-ring transition-all duration-200">
-                                                    @break
+                                                @break
 
                                                 @case('file_upload')
-                                                    <input type="file" 
-                                                        id="custom_question_{{ $question->id }}" 
+                                                    <input type="file" id="custom_question_{{ $question->id }}"
                                                         name="custom_questions[{{ $question->id }}]"
-                                                        @if($question->is_required) required @endif
+                                                        @if ($question->is_required) required @endif
                                                         class="w-full px-4 py-3 border border-gray-300 rounded-lg company-focus company-ring transition-all duration-200 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:company-bg file:text-white file:font-medium file:hover:company-bg-hover">
-                                                    @break
+                                                @break
 
                                                 @case('toggle')
                                                     <div class="flex items-center">
-                                                        <input type="hidden" name="custom_questions[{{ $question->id }}]" value="0">
-                                                        <input type="checkbox" 
-                                                            id="custom_question_{{ $question->id }}" 
-                                                            name="custom_questions[{{ $question->id }}]"
-                                                            value="1"
-                                                            @if($question->is_required) required @endif
+                                                        <input type="hidden" name="custom_questions[{{ $question->id }}]"
+                                                            value="0">
+                                                        <input type="checkbox" id="custom_question_{{ $question->id }}"
+                                                            name="custom_questions[{{ $question->id }}]" value="1"
+                                                            @if ($question->is_required) required @endif
                                                             class="h-4 w-4 company-text focus:company-ring border-gray-300 rounded">
-                                                        <label for="custom_question_{{ $question->id }}" 
+                                                        <label for="custom_question_{{ $question->id }}"
                                                             class="ml-2 block text-sm text-gray-700">Yes</label>
                                                     </div>
-                                                    @break
+                                                @break
 
                                                 @case('multi_select')
-                                                    @if($question->options && is_array($question->options))
+                                                    @if ($question->options && is_array($question->options))
                                                         <div class="space-y-2">
-                                                            @foreach($question->options as $option)
+                                                            @foreach ($question->options as $option)
                                                                 <div class="flex items-center">
-                                                                    <input type="checkbox" 
-                                                                        id="custom_question_{{ $question->id }}_{{ $loop->index }}" 
+                                                                    <input type="checkbox"
+                                                                        id="custom_question_{{ $question->id }}_{{ $loop->index }}"
                                                                         name="custom_questions[{{ $question->id }}][]"
                                                                         value="{{ $option }}"
                                                                         class="h-4 w-4 company-text focus:company-ring border-gray-300 rounded">
-                                                                    <label for="custom_question_{{ $question->id }}_{{ $loop->index }}" 
+                                                                    <label
+                                                                        for="custom_question_{{ $question->id }}_{{ $loop->index }}"
                                                                         class="ml-2 block text-sm text-gray-700">{{ $option }}</label>
                                                                 </div>
                                                             @endforeach
                                                         </div>
                                                     @endif
-                                                    @break
+                                                @break
                                             @endswitch
                                         </div>
                                     @endforeach
+                                </div>
+                            @endif
+
+                            <!-- Honeypot field (hidden from users, should remain empty) -->
+                            <input type="text" name="website" style="display: none;" tabindex="-1"
+                                autocomplete="off">
+
+                            <!-- reCAPTCHA -->
+                            @if (config('recaptcha.enabled'))
+                                <div class="recaptcha-container">
+                                    @if (config('recaptcha.version') === 'v2')
+                                        <div class="g-recaptcha" data-sitekey="{{ config('recaptcha.site_key') }}"
+                                            data-theme="light" data-size="normal">
+                                        </div>
+                                    @else
+                                        <!-- reCAPTCHA v3 will be handled by JavaScript -->
+                                        <input type="hidden" name="g-recaptcha-response" id="g-recaptcha-response">
+                                    @endif
+
+                                    <!-- reCAPTCHA Error Display -->
+                                    <div id="recaptcha-error"
+                                        class="hidden mt-2 p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg">
+                                        <div class="flex items-center">
+                                            <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fill-rule="evenodd"
+                                                    d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                                                    clip-rule="evenodd"></path>
+                                            </svg>
+                                            <span id="recaptcha-error-text">Please complete the reCAPTCHA
+                                                verification.</span>
+                                        </div>
+                                    </div>
                                 </div>
                             @endif
 
@@ -551,6 +595,14 @@
     </section>
 
     <script>
+        // reCAPTCHA v3 initialization
+        @if (config('recaptcha.enabled') && config('recaptcha.version') === 'v3')
+            let recaptchaReady = false;
+            grecaptcha.ready(function() {
+                recaptchaReady = true;
+            });
+        @endif
+
         document.addEventListener('DOMContentLoaded', function() {
             const form = document.getElementById('jobApplicationForm');
             const submitBtn = document.getElementById('submitBtn');
@@ -569,6 +621,35 @@
                 // Clear previous messages
                 hideMessages();
 
+                @if (config('recaptcha.enabled'))
+                    @if (config('recaptcha.version') === 'v2')
+                        // Check reCAPTCHA v2
+                        const recaptchaResponse = grecaptcha.getResponse();
+                        if (!recaptchaResponse) {
+                            showRecaptchaError('Please complete the reCAPTCHA verification.');
+                            return;
+                        }
+                    @elseif (config('recaptcha.version') === 'v3')
+                        // Handle reCAPTCHA v3
+                        if (!recaptchaReady) {
+                            showRecaptchaError('reCAPTCHA is still loading. Please try again.');
+                            return;
+                        }
+
+                        grecaptcha.execute('{{ config('recaptcha.site_key') }}', {
+                            action: '{{ config('recaptcha.action') }}'
+                        }).then(function(token) {
+                            document.getElementById('g-recaptcha-response').value = token;
+                            submitFormWithData();
+                        });
+                        return; // Wait for reCAPTCHA v3 callback
+                    @endif
+                @endif
+
+                submitFormWithData();
+            });
+
+            function submitFormWithData() {
                 // Show loading state
                 setLoadingState(true);
 
@@ -612,49 +693,71 @@
                         console.error('Error:', error);
                         showErrorMessage('Network error. Please check your connection and try again.');
                     });
-            });
+            }
 
             function setLoadingState(loading) {
-                if (loading) {
-                    submitBtn.disabled = true;
-                    submitText.textContent = 'Submitting...';
-                    submitIcon.classList.add('hidden');
-                    loadingIcon.classList.remove('hidden');
-                } else {
-                    submitBtn.disabled = false;
-                    submitText.textContent = 'Submit Application';
-                    submitIcon.classList.remove('hidden');
-                    loadingIcon.classList.add('hidden');
-                }
+            if (loading) {
+                submitBtn.disabled = true;
+                submitText.textContent = 'Submitting...';
+                submitIcon.classList.add('hidden');
+                loadingIcon.classList.remove('hidden');
+            } else {
+                submitBtn.disabled = false;
+                submitText.textContent = 'Submit Application';
+                submitIcon.classList.remove('hidden');
+                loadingIcon.classList.add('hidden');
             }
+        }
 
-            function showSuccessMessage(message) {
-                messagesContainer.classList.remove('hidden');
-                successMessage.classList.remove('hidden');
-                errorMessage.classList.add('hidden');
-                successText.innerHTML = message;
+        function showSuccessMessage(message) {
+            messagesContainer.classList.remove('hidden');
+            successMessage.classList.remove('hidden');
+            errorMessage.classList.add('hidden');
+            successText.innerHTML = message;
+        }
+
+        function showErrorMessage(message) {
+            messagesContainer.classList.remove('hidden');
+            errorMessage.classList.remove('hidden');
+            successMessage.classList.add('hidden');
+            errorText.innerHTML = message;
+
+            // Scroll to error message with a slight delay to ensure the element is visible
+            setTimeout(() => {
+                messagesContainer.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center'
+                });
+            }, 100);
+        }
+
+        function hideMessages() {
+            messagesContainer.classList.add('hidden');
+            successMessage.classList.add('hidden');
+            errorMessage.classList.add('hidden');
+
+            // Hide reCAPTCHA error
+            const recaptchaError = document.getElementById('recaptcha-error');
+            if (recaptchaError) {
+                recaptchaError.classList.add('hidden');
             }
+        }
 
-            function showErrorMessage(message) {
-                messagesContainer.classList.remove('hidden');
-                errorMessage.classList.remove('hidden');
-                successMessage.classList.add('hidden');
-                errorText.innerHTML = message;
+        function showRecaptchaError(message) {
+            const recaptchaError = document.getElementById('recaptcha-error');
+            const recaptchaErrorText = document.getElementById('recaptcha-error-text');
 
-                // Scroll to error message with a slight delay to ensure the element is visible
-                setTimeout(() => {
-                    messagesContainer.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'center'
-                    });
-                }, 100);
+            if (recaptchaError && recaptchaErrorText) {
+                recaptchaErrorText.textContent = message;
+                recaptchaError.classList.remove('hidden');
+
+                // Scroll to error
+                recaptchaError.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center'
+                });
             }
-
-            function hideMessages() {
-                messagesContainer.classList.add('hidden');
-                successMessage.classList.add('hidden');
-                errorMessage.classList.add('hidden');
-            }
+        }
 
             // File input validation
             const resumeInput = document.getElementById('resume');
@@ -663,13 +766,13 @@
                 if (file) {
                     const maxSize = 5 * 1024 * 1024; // 5MB
                     const allowedTypes = [
-                        'application/pdf', 
+                        'application/pdf',
                         'application/msword',
                         'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
                         'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', // Excel .xlsx
                         'application/vnd.ms-excel', // Excel .xls
                         'image/jpeg',
-                        'image/jpg', 
+                        'image/jpg',
                         'image/png',
                         'image/gif',
                         'text/plain',
