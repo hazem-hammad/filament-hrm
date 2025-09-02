@@ -32,7 +32,6 @@ class SecureJobApplicationRequest extends SecureFormRequest
             'years_of_experience' => ['required', 'integer', 'min:0', 'max:50'],
             'resume' => ['required', 'file', 'mimes:pdf,doc,docx,xlsx,xls,jpg,jpeg,png,gif,txt,csv', 'max:5120'],
             'linkedin_url' => ['required', 'url', 'max:255', 'regex:/^https?:\/\/(www\.)?linkedin\.com\/in\/[a-zA-Z0-9-]+\/?$/', new SafeUrl],
-            'g-recaptcha-response' => ['required_if:' . config('recaptcha.enabled') . ',true'],
         ];
 
         // Add custom question validation if job exists
@@ -95,11 +94,6 @@ class SecureJobApplicationRequest extends SecureFormRequest
     public function withValidator($validator)
     {
         $validator->after(function ($validator) {
-            // Additional reCAPTCHA validation
-            if (config('recaptcha.enabled') && !config('recaptcha.skip_testing')) {
-                $this->validateRecaptcha($validator);
-            }
-
             // Rate limiting check
             $this->checkRateLimit($validator);
 
@@ -108,57 +102,6 @@ class SecureJobApplicationRequest extends SecureFormRequest
         });
     }
 
-    /**
-     * Validate reCAPTCHA response
-     */
-    private function validateRecaptcha($validator)
-    {
-        $recaptchaResponse = $this->input('g-recaptcha-response');
-
-        if (empty($recaptchaResponse)) {
-            $validator->errors()->add('recaptcha', 'Please complete the reCAPTCHA verification.');
-            return;
-        }
-
-        $recaptcha = new ReCaptcha(config('recaptcha.secret_key'));
-
-        // For v3, include action verification  
-        if (config('recaptcha.version') === 'v3') {
-            $response = $recaptcha
-                ->setExpectedAction(config('recaptcha.action'))
-                ->setScoreThreshold(config('recaptcha.score_threshold'))
-                ->verify($recaptchaResponse, $this->ip());
-        } else {
-            $response = $recaptcha->verify($recaptchaResponse, $this->ip());
-        }
-
-        if (!$response->isSuccess()) {
-            $validator->errors()->add('recaptcha', 'reCAPTCHA verification failed. Please try again.');
-
-            \Log::warning('reCAPTCHA validation failed in form request', [
-                'ip' => $this->ip(),
-                'errors' => $response->getErrorCodes(),
-                'version' => config('recaptcha.version'),
-            ]);
-        }
-
-        // Check v3 score if applicable
-        if (config('recaptcha.version') === 'v3' && $response->isSuccess()) {
-            $score = $response->getScore();
-            $threshold = config('recaptcha.score_threshold', 0.5);
-
-            if ($score < $threshold) {
-                $validator->errors()->add('recaptcha', 'Security verification failed.');
-
-                \Log::warning('reCAPTCHA score too low in form request', [
-                    'ip' => $this->ip(),
-                    'score' => $score,
-                    'threshold' => $threshold,
-                    'action' => $response->getAction(),
-                ]);
-            }
-        }
-    }
 
     /**
      * Check for rate limiting
@@ -205,7 +148,6 @@ class SecureJobApplicationRequest extends SecureFormRequest
             'email.email' => 'Please provide a valid email address.',
             'phone.regex' => 'Please provide a valid phone number.',
             'linkedin_url.regex' => 'Please provide a valid LinkedIn profile URL.',
-            'g-recaptcha-response.required_if' => 'Please complete the reCAPTCHA verification.',
             'resume.max' => 'Resume file size cannot exceed 5MB.',
             'custom_questions.*.regex' => 'Invalid characters detected in your response.',
         ];
