@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Models\JobApplication;
+use App\Observers\JobApplicationObserver;
 use Illuminate\Support\ServiceProvider;
 
 class EventServiceProvider extends ServiceProvider
@@ -19,6 +21,6 @@ class EventServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        JobApplication::observe(JobApplicationObserver::class);
     }
 }

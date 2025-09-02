@@ -7,7 +7,10 @@ use App\Models\Job;
 use App\Models\Setting;
 use App\Models\JobApplication;
 use App\Models\User;
+use App\Notifications\ApplicantNotifiable;
+use App\Notifications\JobApplicationReceived;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 
 class CareerController extends Controller
@@ -124,13 +127,28 @@ class CareerController extends Controller
                 }
             }
 
+            // Send notification to configured receiver email
+            $receiverEmail = get_setting('receiver_email');
+            if ($receiverEmail) {
+                try {
+                    $notifiable = new ApplicantNotifiable($receiverEmail, 'HR Team');
+                    $notifiable->notify(new JobApplicationReceived($application));
+                } catch (\Exception $e) {
+                    Log::error('Failed to send job application received notification', [
+                        'job_application_id' => $application->id,
+                        'receiver_email' => $receiverEmail,
+                        'error' => $e->getMessage()
+                    ]);
+                }
+            }
+
             return response()->json([
                 'success' => true,
                 'message' => 'Application submitted successfully! We will review your application and get back to you soon.',
                 'application_id' => $application->id
             ]);
         } catch (\Exception $e) {
-            \Log::error('Job application error: ' . $e->getMessage(), [
+            Log::error('Job application error: ' . $e->getMessage(), [
                 'job_id' => $job->id,
                 'user_email' => $request->email
             ]);

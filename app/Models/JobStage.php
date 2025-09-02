@@ -12,6 +12,7 @@ class JobStage extends Model
         'name',
         'status',
         'sort',
+        'email_template',
     ];
 
     protected $casts = [

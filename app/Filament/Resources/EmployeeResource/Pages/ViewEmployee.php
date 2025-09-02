@@ -20,7 +20,8 @@ class ViewEmployee extends ViewRecord
                 'documents.folder',
                 'directReports.position',
                 'directReports.department',
-                'workPlans'
+                'workPlans',
+                'assets'
             ]);
     }
 
@@ -171,6 +172,63 @@ class ViewEmployee extends ViewRecord
                             ])
                             ->columnSpanFull()
                             ->visible(fn($record) => $record->documents->count() > 0),
+
+                        // Assigned Assets Section
+                        Components\Section::make('Assigned Assets')
+                            ->schema([
+                                Components\RepeatableEntry::make('assets')
+                                    ->label('Currently Assigned Assets')
+                                    ->schema([
+                                        Components\TextEntry::make('asset_id')
+                                            ->label('Asset ID')
+                                            ->badge()
+                                            ->color('primary')
+                                            ->copyable()
+                                            ->weight('medium'),
+                                        Components\TextEntry::make('name')
+                                            ->label('Asset Name')
+                                            ->icon('heroicon-o-computer-desktop')
+                                            ->weight('medium')
+                                            ->description(fn($record) => $record->brand && $record->model ? "{$record->brand} {$record->model}" : null),
+                                        Components\TextEntry::make('category')
+                                            ->label('Category')
+                                            ->badge()
+                                            ->color('info'),
+                                        Components\TextEntry::make('status')
+                                            ->label('Status')
+                                            ->badge()
+                                            ->color(fn($state) => match($state) {
+                                                \App\Enum\AssetStatus::ASSIGNED => 'success',
+                                                \App\Enum\AssetStatus::AVAILABLE => 'warning',
+                                                \App\Enum\AssetStatus::MAINTENANCE => 'danger',
+                                                \App\Enum\AssetStatus::RETIRED => 'gray',
+                                                default => 'gray',
+                                            })
+                                            ->formatStateUsing(fn($state) => $state->label()),
+                                        Components\TextEntry::make('condition')
+                                            ->label('Condition')
+                                            ->badge()
+                                            ->color(fn($state) => $state->color())
+                                            ->formatStateUsing(fn($state) => $state->label()),
+                                        Components\TextEntry::make('assigned_at')
+                                            ->label('Assigned Date')
+                                            ->date()
+                                            ->icon('heroicon-o-calendar-days'),
+                                        Components\TextEntry::make('location')
+                                            ->label('Location')
+                                            ->icon('heroicon-o-map-pin')
+                                            ->placeholder('No location specified'),
+                                        Components\TextEntry::make('serial_number')
+                                            ->label('Serial Number')
+                                            ->placeholder('Not specified')
+                                            ->copyable(),
+                                    ])
+                                    ->columns(4)
+                                    ->columnSpanFull()
+                                    ->placeholder('No assets are currently assigned to this employee'),
+                            ])
+                            ->columnSpanFull()
+                            ->visible(fn($record) => $record->assets->count() > 0),
 
                         // Team Members Section (for managers)
                         Components\Section::make('Team Members')

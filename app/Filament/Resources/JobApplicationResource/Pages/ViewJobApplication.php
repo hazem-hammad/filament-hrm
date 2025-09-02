@@ -5,6 +5,8 @@ namespace App\Filament\Resources\JobApplicationResource\Pages;
 use App\Filament\Resources\JobApplicationResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ViewRecord;
+use Filament\Infolists;
+use Filament\Infolists\Infolist;
 
 class ViewJobApplication extends ViewRecord
 {
@@ -25,5 +27,10 @@ class ViewJobApplication extends ViewRecord
             Actions\EditAction::make()
                 ->icon('heroicon-o-pencil'),
         ];
+    }
+    
+    public function hasCombinedRelationManagerTabsWithContent(): bool
+    {
+        return true;
     }
 }

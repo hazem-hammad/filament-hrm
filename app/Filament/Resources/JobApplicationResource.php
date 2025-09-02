@@ -11,6 +11,7 @@ use Filament\Forms\Form;
 use Filament\Infolists;
 use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
+use Filament\Resources\Pages\Page;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -417,7 +418,7 @@ class JobApplicationResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            RelationManagers\NotesRelationManager::class,
         ];
     }
 

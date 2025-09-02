@@ -45,6 +45,14 @@ class SettingsSeeder extends Seeder
                 'media_collection_name' => 'logo_dark',
                 'type' => 'file',
             ],
+            [
+                'group' => 'Careers',
+                'name' => 'Receiver email',
+                'key' => 'receiver_email',
+                'value' => null,
+                'is_configurable_by_admin' => true,
+                'type' => 'text',
+            ],
         ];
 
         foreach ($settings as $setting) {

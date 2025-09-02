@@ -21,18 +21,6 @@ class ListJobs extends ListRecords
                 Tables\Columns\TextColumn::make('title')
                     ->searchable()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('department.name')
-                    ->label('Department')
-                    ->searchable()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('position.name')
-                    ->label('Position')
-                    ->searchable()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('number_of_positions')
-                    ->label('Positions')
-                    ->numeric()
-                    ->sortable(),
                 Tables\Columns\TextColumn::make('work_type')
                     ->formatStateUsing(
                         fn(string $state): string =>
@@ -87,20 +75,6 @@ class ListJobs extends ListRecords
                 Tables\Columns\TextColumn::make('end_date')
                     ->date()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('customQuestions')
-                    ->label('Custom Questions')
-                    ->formatStateUsing(
-                        fn(Job $record): string =>
-                        $record->customQuestions->count() > 0
-                            ? $record->customQuestions->count() . ' questions'
-                            : 'No questions'
-                    )
-                    ->badge()
-                    ->color(
-                        fn(Job $record): string =>
-                        $record->customQuestions->count() > 0 ? 'success' : 'gray'
-                    )
-                    ->toggleable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -178,7 +152,7 @@ class ListJobs extends ListRecords
             Actions\Action::make('careers')
                 ->label('Careers')
                 ->icon('heroicon-o-arrow-top-right-on-square')
-                ->color('danger')
+                ->color('info')
                 ->url('/careers')
                 ->openUrlInNewTab(),
         ];

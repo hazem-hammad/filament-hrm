@@ -39,6 +39,25 @@ class JobStageResource extends Resource
                             ->required(),
                     ])
                     ->columns(3),
+
+                Forms\Components\Section::make('Email Template')
+                    ->schema([
+                        Forms\Components\RichEditor::make('email_template')
+                            ->label('Email Template')
+                            ->helperText('Email template sent to applicants when they reach this stage. Use {first_name}, {last_name}, {job_title}, and {stage_name} as placeholders.')
+                            ->toolbarButtons([
+                                'bold',
+                                'italic',
+                                'underline',
+                                'bulletList',
+                                'orderedList',
+                                'link',
+                                'h2',
+                                'h3',
+                                'blockquote',
+                            ])
+                            ->columnSpanFull(),
+                    ]),
             ]);
     }
 

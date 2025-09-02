@@ -86,6 +86,11 @@ class Employee extends Authenticatable implements HasMedia
         return $this->hasMany(Document::class, 'assigned_to');
     }
 
+    public function assets(): HasMany
+    {
+        return $this->hasMany(Asset::class, 'assigned_to');
+    }
+
     public function registerMediaCollections(): void
     {
         // Profile image collection

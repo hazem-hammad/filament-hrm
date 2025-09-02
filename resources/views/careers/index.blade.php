@@ -347,11 +347,16 @@
                             <select name="experience_level" id="experience_level"
                                 class="w-full sm:w-32 rounded-lg border border-gray-300 py-2.5 pl-3 pr-8 text-sm text-gray-700 bg-white appearance-none company-focus">
                                 <option value="">Experience</option>
-                                <option value="entry" {{ request('experience_level') == 'entry' ? 'selected' : '' }}>Entry</option>
-                                <option value="junior" {{ request('experience_level') == 'junior' ? 'selected' : '' }}>Junior</option>
-                                <option value="mid" {{ request('experience_level') == 'mid' ? 'selected' : '' }}>Mid</option>
-                                <option value="senior" {{ request('experience_level') == 'senior' ? 'selected' : '' }}>Senior</option>
-                                <option value="lead" {{ request('experience_level') == 'lead' ? 'selected' : '' }}>Lead</option>
+                                <option value="entry" {{ request('experience_level') == 'entry' ? 'selected' : '' }}>
+                                    Entry</option>
+                                <option value="junior" {{ request('experience_level') == 'junior' ? 'selected' : '' }}>
+                                    Junior</option>
+                                <option value="mid" {{ request('experience_level') == 'mid' ? 'selected' : '' }}>Mid
+                                </option>
+                                <option value="senior" {{ request('experience_level') == 'senior' ? 'selected' : '' }}>
+                                    Senior</option>
+                                <option value="lead" {{ request('experience_level') == 'lead' ? 'selected' : '' }}>
+                                    Lead</option>
                             </select>
                         </div>
 
@@ -359,9 +364,12 @@
                             <select name="work_mode" id="work_mode"
                                 class="w-full sm:w-32 rounded-lg border border-gray-300 py-2.5 pl-3 pr-8 text-sm text-gray-700 bg-white appearance-none company-focus">
                                 <option value="">Work Mode</option>
-                                <option value="remote" {{ request('work_mode') == 'remote' ? 'selected' : '' }}>Remote</option>
-                                <option value="onsite" {{ request('work_mode') == 'onsite' ? 'selected' : '' }}>On-site</option>
-                                <option value="hybrid" {{ request('work_mode') == 'hybrid' ? 'selected' : '' }}>Hybrid</option>
+                                <option value="remote" {{ request('work_mode') == 'remote' ? 'selected' : '' }}>Remote
+                                </option>
+                                <option value="onsite" {{ request('work_mode') == 'onsite' ? 'selected' : '' }}>
+                                    On-site</option>
+                                <option value="hybrid" {{ request('work_mode') == 'hybrid' ? 'selected' : '' }}>Hybrid
+                                </option>
                             </select>
                         </div>
 
@@ -369,10 +377,14 @@
                             <select name="work_type" id="work_type"
                                 class="w-full sm:w-32 rounded-lg border border-gray-300 py-2.5 pl-3 pr-8 text-sm text-gray-700 bg-white appearance-none company-focus">
                                 <option value="">Type</option>
-                                <option value="full_time" {{ request('work_type') == 'full_time' ? 'selected' : '' }}>Full Time</option>
-                                <option value="part_time" {{ request('work_type') == 'part_time' ? 'selected' : '' }}>Part Time</option>
-                                <option value="contract" {{ request('work_type') == 'contract' ? 'selected' : '' }}>Contract</option>
-                                <option value="internship" {{ request('work_type') == 'internship' ? 'selected' : '' }}>Internship</option>
+                                <option value="full_time" {{ request('work_type') == 'full_time' ? 'selected' : '' }}>
+                                    Full Time</option>
+                                <option value="part_time" {{ request('work_type') == 'part_time' ? 'selected' : '' }}>
+                                    Part Time</option>
+                                <option value="contract" {{ request('work_type') == 'contract' ? 'selected' : '' }}>
+                                    Contract</option>
+                                <option value="internship"
+                                    {{ request('work_type') == 'internship' ? 'selected' : '' }}>Internship</option>
                             </select>
                         </div>
 
@@ -407,112 +419,144 @@
         <!-- Jobs list -->
         <div class="space-y-4">
 
-                @forelse ($jobs as $job)
-                    <!-- Simplified job card -->
-                    <div class="group bg-white rounded-lg border border-gray-200 p-4 hover:shadow-md transition-all duration-200 hover:border-gray-300">
-                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                            <!-- Left content -->
-                            <div class="flex-1 min-w-0">
-                                <!-- Job title -->
-                                <h3 class="text-lg font-semibold text-gray-900 group-hover:company-text transition-colors duration-200 mb-2">
-                                    {{ $job->title }}
-                                </h3>
+            @forelse ($jobs as $job)
+                <!-- Simplified job card -->
+                <div
+                    class="group bg-white rounded-lg border border-gray-200 p-4 hover:shadow-md transition-all duration-200 hover:border-gray-300">
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                        <!-- Left content -->
+                        <div class="flex-1 min-w-0">
+                            <!-- Job title -->
+                            <h3
+                                class="text-lg font-semibold text-gray-900 group-hover:company-text transition-colors duration-200 mb-2">
+                                {{ $job->title }}
+                            </h3>
 
-                                <!-- Company info -->
-                                <div class="flex items-center gap-3 mb-2 text-sm text-gray-600">
-                                    <span>{{ get_setting('company_name') }}</span>
-                                    <span>•</span>
-                                    <span>{{ $job->created_at->diffForHumans() }}</span>
-                                </div>
-
-                                <!-- Tags -->
-                                <div class="flex flex-wrap gap-1.5 mb-2">
-                                    @php
-                                        $levelNames = ['entry' => 'Entry', 'junior' => 'Junior', 'mid' => 'Mid', 'senior' => 'Senior', 'lead' => 'Lead'];
-                                        $workTypeNames = ['full_time' => 'Full Time', 'part_time' => 'Part Time', 'contract' => 'Contract', 'internship' => 'Internship'];
-                                        $workModeNames = ['remote' => 'Remote', 'onsite' => 'On-site', 'hybrid' => 'Hybrid'];
-                                    @endphp
-                                    <span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-blue-50 text-blue-700">
-                                        {{ $levelNames[$job->experience_level] ?? $job->experience_level }}
-                                    </span>
-                                    <span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-green-50 text-green-700">
-                                        {{ $workTypeNames[$job->work_type] ?? $job->work_type }}
-                                    </span>
-                                    <span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-purple-50 text-purple-700">
-                                        {{ $workModeNames[$job->work_mode] ?? $job->work_mode }}
-                                    </span>
-                                </div>
-
-                                <!-- Description -->
-                                <p class="text-sm text-gray-600 line-clamp-2">
-                                    {{ $job->short_description ?: 'Join our team and help us build amazing products.' }}
-                                </p>
+                            <!-- Company info -->
+                            <div class="flex items-center gap-3 mb-2 text-sm text-gray-600">
+                                <span>{{ get_setting('company_name') }}</span>
+                                <span>•</span>
+                                <span>{{ $job->created_at->diffForHumans() }}</span>
                             </div>
 
-                            <!-- Right content -->
-                            <div class="flex-shrink-0">
-                                <a href="{{ route('jobs.show', $job->slug) }}"
-                                    class="inline-flex items-center justify-center px-4 py-2 company-border company-text bg-white rounded-lg hover:company-bg hover:text-white transition-all duration-200 font-medium text-sm">
-                                    View Details
-                                    <svg class="ml-1 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                                    </svg>
-                                </a>
+                            <!-- Tags -->
+                            <div class="flex flex-wrap gap-1.5 mb-2">
+                                @php
+                                    $levelNames = [
+                                        'entry' => 'Entry',
+                                        'junior' => 'Junior',
+                                        'mid' => 'Mid',
+                                        'senior' => 'Senior',
+                                        'lead' => 'Lead',
+                                    ];
+                                    $workTypeNames = [
+                                        'full_time' => 'Full Time',
+                                        'part_time' => 'Part Time',
+                                        'contract' => 'Contract',
+                                        'internship' => 'Internship',
+                                    ];
+                                    $workModeNames = [
+                                        'remote' => 'Remote',
+                                        'onsite' => 'On-site',
+                                        'hybrid' => 'Hybrid',
+                                    ];
+                                @endphp
+                                <span
+                                    class="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-blue-50 text-blue-700">
+                                    {{ $levelNames[$job->experience_level] ?? $job->experience_level }}
+                                </span>
+                                <span
+                                    class="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-green-50 text-green-700">
+                                    {{ $workTypeNames[$job->work_type] ?? $job->work_type }}
+                                </span>
+                                <span
+                                    class="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-purple-50 text-purple-700">
+                                    {{ $workModeNames[$job->work_mode] ?? $job->work_mode }}
+                                </span>
                             </div>
+
+                            <!-- Description -->
+                            <p class="text-sm text-gray-600 line-clamp-2">
+                                {{ $job->short_description ?: 'Join our team and help us build amazing products.' }}
+                            </p>
+                        </div>
+
+                        <!-- Right content -->
+                        <div class="flex-shrink-0">
+                            <a href="{{ route('jobs.show', $job->slug) }}"
+                                class="inline-flex items-center justify-center px-4 py-2 company-border company-text bg-white rounded-lg hover:company-bg transition-all duration-200 font-medium text-sm">
+                                View Details
+                                <svg class="ml-1 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M9 5l7 7-7 7"></path>
+                                </svg>
+                            </a>
                         </div>
                     </div>
-                @empty
-                    <!-- No jobs placeholder -->
-                    <div class="rounded-lg border border-gray-200 bg-gray-50 p-8 text-center">
-                        <div class="mx-auto max-w-sm">
-                            @php
-                                $hasSearch = request()->filled('search');
-                                $hasFilters = request()->filled(['experience_level', 'work_mode', 'work_type']);
-                                $hasAnyFilters = $hasSearch || $hasFilters;
-                            @endphp
+                </div>
+            @empty
+                <!-- No jobs placeholder -->
+                <div class="rounded-lg border border-gray-200 bg-gray-50 p-8 text-center">
+                    <div class="mx-auto max-w-sm">
+                        @php
+                            $hasSearch = request()->filled('search');
+                            $hasFilters = request()->filled(['experience_level', 'work_mode', 'work_type']);
+                            $hasAnyFilters = $hasSearch || $hasFilters;
+                        @endphp
 
-                            <!-- Icon -->
-                            <div class="mx-auto mb-4 w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center">
-                                @if ($hasAnyFilters)
-                                    <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                                    </svg>
-                                @else
-                                    <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2-2v2m8 0V6a2 2 0 012 2v6a2 2 0 01-2 2H8a2 2 0 01-2-2V8a2 2 0 012-2V6"></path>
-                                    </svg>
-                                @endif
-                            </div>
-
-                            <!-- Title and description -->
+                        <!-- Icon -->
+                        <div class="mx-auto mb-4 w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center">
                             @if ($hasAnyFilters)
-                                <h3 class="text-lg font-semibold text-gray-900 mb-2">No matching jobs found</h3>
-                                <p class="text-sm text-gray-600 mb-4">
-                                    Try adjusting your search or filters to see more results.
-                                </p>
-                                <button onclick="clearAllFilters()" class="inline-flex items-center justify-center px-4 py-2 company-bg text-white rounded-lg company-bg-hover transition-all duration-200 font-medium text-sm">
-                                    <svg class="mr-1 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
-                                    </svg>
-                                    Clear Filters
-                                </button>
+                                <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                                </svg>
                             @else
-                                <h3 class="text-lg font-semibold text-gray-900 mb-2">No open positions</h3>
-                                <p class="text-sm text-gray-600 mb-4">
-                                    We don't have any job openings at {{ get_setting('company_name') }} right now.
-                                </p>
-                                <a href="/contact" class="inline-flex items-center justify-center px-4 py-2 company-bg text-white rounded-lg company-bg-hover transition-all duration-200 font-medium text-sm">
-                                    <svg class="mr-1 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
-                                    </svg>
-                                    Get Notified
-                                </a>
+                                <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2-2v2m8 0V6a2 2 0 012 2v6a2 2 0 01-2 2H8a2 2 0 01-2-2V8a2 2 0 012-2V6">
+                                    </path>
+                                </svg>
                             @endif
                         </div>
-                    </div>
-                @endforelse
 
-            </div>
+                        <!-- Title and description -->
+                        @if ($hasAnyFilters)
+                            <h3 class="text-lg font-semibold text-gray-900 mb-2">No matching jobs found</h3>
+                            <p class="text-sm text-gray-600 mb-4">
+                                Try adjusting your search or filters to see more results.
+                            </p>
+                            <button onclick="clearAllFilters()"
+                                class="inline-flex items-center justify-center px-4 py-2 company-bg text-white rounded-lg company-bg-hover transition-all duration-200 font-medium text-sm">
+                                <svg class="mr-1 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15">
+                                    </path>
+                                </svg>
+                                Clear Filters
+                            </button>
+                        @else
+                            <h3 class="text-lg font-semibold text-gray-900 mb-2">No open positions</h3>
+                            <p class="text-sm text-gray-600 mb-4">
+                                We don't have any job openings at {{ get_setting('company_name') }} right now.
+                            </p>
+                            <a href="/contact"
+                                class="inline-flex items-center justify-center px-4 py-2 company-bg text-white rounded-lg company-bg-hover transition-all duration-200 font-medium text-sm">
+                                <svg class="mr-1 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z">
+                                    </path>
+                                </svg>
+                                Get Notified
+                            </a>
+                        @endif
+                    </div>
+                </div>
+            @endforelse
+
+        </div>
 
         </div>
     </section>
