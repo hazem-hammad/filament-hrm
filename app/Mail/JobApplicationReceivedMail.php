@@ -29,7 +29,6 @@ class JobApplicationReceivedMail extends Mailable implements ShouldQueue
     public function envelope(): Envelope
     {
         return new Envelope(
-            to: get_setting('receiver_email'),
             subject: 'New Job Application Received - ' . $this->jobApplication->job->title,
         );
     }

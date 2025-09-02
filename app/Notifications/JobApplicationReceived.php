@@ -31,9 +31,10 @@ class JobApplicationReceived extends Notification implements ShouldQueue
     /**
      * Get the mail representation of the notification.
      */
-    public function toMail($notifiable): JobApplicationReceivedMail
+    public function toMail($notifiable)
     {
-        return new JobApplicationReceivedMail($this->jobApplication);
+        return (new JobApplicationReceivedMail($this->jobApplication))
+            ->to($notifiable->routeNotificationForMail());
     }
 
     /**

@@ -18,7 +18,7 @@ class SecurityRateLimitMiddleware
     public function handle(Request $request, Closure $next, string $limiter = 'general'): Response
     {
         $key = $this->resolveRequestSignature($request, $limiter);
-        
+
         if (RateLimiter::tooManyAttempts($key, $this->getMaxAttempts($limiter))) {
             $this->logRateLimitExceeded($request, $limiter);
             return $this->buildRateLimitResponse($request, $key);
@@ -40,7 +40,7 @@ class SecurityRateLimitMiddleware
         $ip = $request->ip();
         $fingerprint = $this->getRequestFingerprint($request);
 
-        return match($limiter) {
+        return match ($limiter) {
             'job_application' => "job_app:{$ip}:{$fingerprint}",
             'sensitive_forms' => "sensitive:{$ip}:{$userId}:{$fingerprint}",
             'auth' => "auth:{$ip}:{$fingerprint}",
@@ -66,7 +66,7 @@ class SecurityRateLimitMiddleware
      */
     protected function getMaxAttempts(string $limiter): int
     {
-        return match($limiter) {
+        return match ($limiter) {
             'job_application' => 10,  // 10 applications per hour (increased from 3)
             'sensitive_forms' => 15,  // 15 form submissions per hour (increased from 5)
             'auth' => 10,            // 10 auth attempts per hour (increased from 5)
@@ -80,7 +80,7 @@ class SecurityRateLimitMiddleware
      */
     protected function getDecayMinutes(string $limiter): int
     {
-        return match($limiter) {
+        return match ($limiter) {
             'job_application' => 60,  // 1 hour
             'sensitive_forms' => 60,  // 1 hour
             'auth' => 60,            // 1 hour
@@ -95,7 +95,7 @@ class SecurityRateLimitMiddleware
     protected function buildRateLimitResponse(Request $request, string $key): Response
     {
         $retryAfter = RateLimiter::availableIn($key);
-        
+
         if ($request->expectsJson()) {
             return response()->json([
                 'success' => false,

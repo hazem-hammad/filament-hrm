@@ -33,9 +33,10 @@ class JobApplicationStageChanged extends Notification implements ShouldQueue
     /**
      * Get the mail representation of the notification.
      */
-    public function toMail($notifiable): JobStageUpdateMail
+    public function toMail($notifiable)
     {
-        return new JobStageUpdateMail($this->jobApplication, $this->newStage);
+        return (new JobStageUpdateMail($this->jobApplication, $this->newStage))
+            ->to($notifiable->routeNotificationForMail());
     }
 
     /**

@@ -31,7 +31,6 @@ class JobStageUpdateMail extends Mailable implements ShouldQueue
     public function envelope(): Envelope
     {
         return new Envelope(
-            to: $this->jobApplication->email,
             subject: 'Update on Your Application for ' . $this->jobApplication->job->title,
         );
     }
