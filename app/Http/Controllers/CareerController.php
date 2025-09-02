@@ -89,8 +89,6 @@ class CareerController extends Controller
                 'email' => $data['email'],
                 'phone' => $data['phone'],
                 'linkedin_url' => $data['linkedin_url'] ?? null,
-                'portfolio_url' => $data['portfolio_url'] ?? null,
-                'github_url' => $data['github_url'] ?? null,
                 'years_of_experience' => $data['years_of_experience'],
                 'status' => true,
             ]);
@@ -104,12 +102,12 @@ class CareerController extends Controller
             if ($request->has('custom_questions')) {
                 foreach ($request->custom_questions as $questionId => $answer) {
                     $question = $customQuestions->find($questionId);
-                    
+
                     if ($question && $question->type === 'file_upload' && $request->hasFile("custom_questions.{$questionId}")) {
                         // Handle file upload for custom questions
                         $file = $request->file("custom_questions.{$questionId}");
                         $media = $application->addMedia($file)->toMediaCollection('custom_questions');
-                        
+
                         $application->answers()->create([
                             'job_application_id' => $application->id,
                             'custom_question_id' => $questionId,

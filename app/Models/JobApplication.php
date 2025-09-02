@@ -22,8 +22,6 @@ class JobApplication extends Model implements HasMedia
         'email',
         'phone',
         'linkedin_url',
-        'portfolio_url',
-        'github_url',
         'years_of_experience',
         'status',
     ];

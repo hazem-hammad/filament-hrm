@@ -341,27 +341,9 @@
                             <div>
                                 <label for="linkedin_url"
                                     class="block text-sm font-medium text-gray-700 mb-2">LinkedIn
-                                    Profile</label>
-                                <input type="url" id="linkedin_url" name="linkedin_url"
+                                    Profile *</label>
+                                <input type="url" id="linkedin_url" name="linkedin_url" required
                                     placeholder="https://linkedin.com/in/yourprofile"
-                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg company-focus company-ring transition-all duration-200">
-                            </div>
-
-                            <!-- Portfolio -->
-                            <div>
-                                <label for="portfolio_url"
-                                    class="block text-sm font-medium text-gray-700 mb-2">Portfolio URL</label>
-                                <input type="url" id="portfolio_url" name="portfolio_url"
-                                    placeholder="https://yourportfolio.com"
-                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg company-focus company-ring transition-all duration-200">
-                            </div>
-
-                            <!-- GitHub -->
-                            <div>
-                                <label for="github_url" class="block text-sm font-medium text-gray-700 mb-2">GitHub
-                                    Profile</label>
-                                <input type="url" id="github_url" name="github_url"
-                                    placeholder="https://github.com/yourusername"
                                     class="w-full px-4 py-3 border border-gray-300 rounded-lg company-focus company-ring transition-all duration-200">
                             </div>
 
@@ -696,68 +678,68 @@
             }
 
             function setLoadingState(loading) {
-            if (loading) {
-                submitBtn.disabled = true;
-                submitText.textContent = 'Submitting...';
-                submitIcon.classList.add('hidden');
-                loadingIcon.classList.remove('hidden');
-            } else {
-                submitBtn.disabled = false;
-                submitText.textContent = 'Submit Application';
-                submitIcon.classList.remove('hidden');
-                loadingIcon.classList.add('hidden');
+                if (loading) {
+                    submitBtn.disabled = true;
+                    submitText.textContent = 'Submitting...';
+                    submitIcon.classList.add('hidden');
+                    loadingIcon.classList.remove('hidden');
+                } else {
+                    submitBtn.disabled = false;
+                    submitText.textContent = 'Submit Application';
+                    submitIcon.classList.remove('hidden');
+                    loadingIcon.classList.add('hidden');
+                }
             }
-        }
 
-        function showSuccessMessage(message) {
-            messagesContainer.classList.remove('hidden');
-            successMessage.classList.remove('hidden');
-            errorMessage.classList.add('hidden');
-            successText.innerHTML = message;
-        }
-
-        function showErrorMessage(message) {
-            messagesContainer.classList.remove('hidden');
-            errorMessage.classList.remove('hidden');
-            successMessage.classList.add('hidden');
-            errorText.innerHTML = message;
-
-            // Scroll to error message with a slight delay to ensure the element is visible
-            setTimeout(() => {
-                messagesContainer.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'center'
-                });
-            }, 100);
-        }
-
-        function hideMessages() {
-            messagesContainer.classList.add('hidden');
-            successMessage.classList.add('hidden');
-            errorMessage.classList.add('hidden');
-
-            // Hide reCAPTCHA error
-            const recaptchaError = document.getElementById('recaptcha-error');
-            if (recaptchaError) {
-                recaptchaError.classList.add('hidden');
+            function showSuccessMessage(message) {
+                messagesContainer.classList.remove('hidden');
+                successMessage.classList.remove('hidden');
+                errorMessage.classList.add('hidden');
+                successText.innerHTML = message;
             }
-        }
 
-        function showRecaptchaError(message) {
-            const recaptchaError = document.getElementById('recaptcha-error');
-            const recaptchaErrorText = document.getElementById('recaptcha-error-text');
+            function showErrorMessage(message) {
+                messagesContainer.classList.remove('hidden');
+                errorMessage.classList.remove('hidden');
+                successMessage.classList.add('hidden');
+                errorText.innerHTML = message;
 
-            if (recaptchaError && recaptchaErrorText) {
-                recaptchaErrorText.textContent = message;
-                recaptchaError.classList.remove('hidden');
-
-                // Scroll to error
-                recaptchaError.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'center'
-                });
+                // Scroll to error message with a slight delay to ensure the element is visible
+                setTimeout(() => {
+                    messagesContainer.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'center'
+                    });
+                }, 100);
             }
-        }
+
+            function hideMessages() {
+                messagesContainer.classList.add('hidden');
+                successMessage.classList.add('hidden');
+                errorMessage.classList.add('hidden');
+
+                // Hide reCAPTCHA error
+                const recaptchaError = document.getElementById('recaptcha-error');
+                if (recaptchaError) {
+                    recaptchaError.classList.add('hidden');
+                }
+            }
+
+            function showRecaptchaError(message) {
+                const recaptchaError = document.getElementById('recaptcha-error');
+                const recaptchaErrorText = document.getElementById('recaptcha-error-text');
+
+                if (recaptchaError && recaptchaErrorText) {
+                    recaptchaErrorText.textContent = message;
+                    recaptchaError.classList.remove('hidden');
+
+                    // Scroll to error
+                    recaptchaError.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'center'
+                    });
+                }
+            }
 
             // File input validation
             const resumeInput = document.getElementById('resume');
@@ -786,7 +768,9 @@
                     }
 
                     if (!allowedTypes.includes(file.type)) {
-                        alert('Only PDF, DOC, DOCX, XLSX, XLS, JPG, PNG, GIF, TXT, and CSV files are allowed');
+                        alert(
+                            'Only PDF, DOC, DOCX, XLSX, XLS, JPG, PNG, GIF, TXT, and CSV files are allowed'
+                            );
                         this.value = '';
                         return;
                     }

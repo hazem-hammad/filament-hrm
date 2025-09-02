@@ -20,8 +20,6 @@ return new class extends Migration
             $table->string('email');
             $table->string('phone');
             $table->string('linkedin_url')->nullable();
-            $table->string('portfolio_url')->nullable();
-            $table->string('github_url')->nullable();
             $table->integer('years_of_experience')->default(0);
             $table->boolean('status')->default(true);
             $table->timestamps();

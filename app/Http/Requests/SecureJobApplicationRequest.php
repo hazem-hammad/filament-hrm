@@ -28,12 +28,10 @@ class SecureJobApplicationRequest extends SecureFormRequest
             'first_name' => ['required', 'string', 'max:255', 'regex:/^[a-zA-Z\s]+$/', new NoSuspiciousContent],
             'last_name' => ['required', 'string', 'max:255', 'regex:/^[a-zA-Z\s]+$/', new NoSuspiciousContent],
             'email' => ['required', 'email:rfc,dns', 'max:255', new NoSuspiciousContent],
-            'phone' => ['required', 'string', 'max:20', 'regex:/^[\+]?[1-9][\d]{0,15}$/', new NoSuspiciousContent],
+            'phone' => ['required', 'string', 'max:11', 'regex:/^(010|011|012|015)\d{8}$/', new NoSuspiciousContent],
             'years_of_experience' => ['required', 'integer', 'min:0', 'max:50'],
             'resume' => ['required', 'file', 'mimes:pdf,doc,docx,xlsx,xls,jpg,jpeg,png,gif,txt,csv', 'max:5120'],
-            'linkedin_url' => ['nullable', 'url', 'max:255', 'regex:/^https?:\/\/(www\.)?linkedin\.com\/in\/[a-zA-Z0-9-]+\/?$/', new SafeUrl],
-            'portfolio_url' => ['nullable', 'url', 'max:255', new SafeUrl],
-            'github_url' => ['nullable', 'url', 'max:255', 'regex:/^https?:\/\/(www\.)?github\.com\/[a-zA-Z0-9-]+\/?$/', new SafeUrl],
+            'linkedin_url' => ['required', 'url', 'max:255', 'regex:/^https?:\/\/(www\.)?linkedin\.com\/in\/[a-zA-Z0-9-]+\/?$/', new SafeUrl],
             'g-recaptcha-response' => ['required_if:' . config('recaptcha.enabled') . ',true'],
         ];
 
@@ -45,7 +43,7 @@ class SecureJobApplicationRequest extends SecureFormRequest
                 foreach ($job->customQuestions as $question) {
                     $fieldName = "custom_questions.{$question->id}";
                     $fieldRules = [];
-                    
+
                     if ($question->is_required) {
                         $fieldRules[] = 'required';
                     } else {
@@ -104,7 +102,7 @@ class SecureJobApplicationRequest extends SecureFormRequest
 
             // Rate limiting check
             $this->checkRateLimit($validator);
-            
+
             // Honeypot check
             $this->checkHoneypot($validator);
         });
@@ -116,14 +114,14 @@ class SecureJobApplicationRequest extends SecureFormRequest
     private function validateRecaptcha($validator)
     {
         $recaptchaResponse = $this->input('g-recaptcha-response');
-        
+
         if (empty($recaptchaResponse)) {
             $validator->errors()->add('recaptcha', 'Please complete the reCAPTCHA verification.');
             return;
         }
 
         $recaptcha = new ReCaptcha(config('recaptcha.secret_key'));
-        
+
         // For v3, include action verification  
         if (config('recaptcha.version') === 'v3') {
             $response = $recaptcha
@@ -136,7 +134,7 @@ class SecureJobApplicationRequest extends SecureFormRequest
 
         if (!$response->isSuccess()) {
             $validator->errors()->add('recaptcha', 'reCAPTCHA verification failed. Please try again.');
-            
+
             \Log::warning('reCAPTCHA validation failed in form request', [
                 'ip' => $this->ip(),
                 'errors' => $response->getErrorCodes(),
@@ -148,10 +146,10 @@ class SecureJobApplicationRequest extends SecureFormRequest
         if (config('recaptcha.version') === 'v3' && $response->isSuccess()) {
             $score = $response->getScore();
             $threshold = config('recaptcha.score_threshold', 0.5);
-            
+
             if ($score < $threshold) {
                 $validator->errors()->add('recaptcha', 'Security verification failed.');
-                
+
                 \Log::warning('reCAPTCHA score too low in form request', [
                     'ip' => $this->ip(),
                     'score' => $score,
@@ -185,10 +183,10 @@ class SecureJobApplicationRequest extends SecureFormRequest
     private function checkHoneypot($validator)
     {
         $honeypot = $this->input('website'); // Hidden field that should be empty
-        
+
         if (!empty($honeypot)) {
             $validator->errors()->add('security', 'Security check failed.');
-            
+
             \Log::warning('Honeypot triggered', [
                 'ip' => $this->ip(),
                 'honeypot_value' => $honeypot,
@@ -207,7 +205,6 @@ class SecureJobApplicationRequest extends SecureFormRequest
             'email.email' => 'Please provide a valid email address.',
             'phone.regex' => 'Please provide a valid phone number.',
             'linkedin_url.regex' => 'Please provide a valid LinkedIn profile URL.',
-            'github_url.regex' => 'Please provide a valid GitHub profile URL.',
             'g-recaptcha-response.required_if' => 'Please complete the reCAPTCHA verification.',
             'resume.max' => 'Resume file size cannot exceed 5MB.',
             'custom_questions.*.regex' => 'Invalid characters detected in your response.',

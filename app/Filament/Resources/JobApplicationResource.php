@@ -97,18 +97,9 @@ class JobApplicationResource extends Resource
                                 Forms\Components\TextInput::make('linkedin_url')
                                     ->label('LinkedIn URL')
                                     ->url()
+                                    ->required()
                                     ->maxLength(255)
                                     ->placeholder('https://linkedin.com/in/username'),
-                                Forms\Components\TextInput::make('portfolio_url')
-                                    ->label('Portfolio URL')
-                                    ->url()
-                                    ->maxLength(255)
-                                    ->placeholder('https://yourportfolio.com'),
-                                Forms\Components\TextInput::make('github_url')
-                                    ->label('GitHub URL')
-                                    ->url()
-                                    ->maxLength(255)
-                                    ->placeholder('https://github.com/username'),
                             ])
                             ->columns(1)
                             ->collapsible(),
@@ -311,18 +302,6 @@ class JobApplicationResource extends Resource
                             ->openUrlInNewTab()
                             ->placeholder('Not provided')
                             ->icon('heroicon-o-link'),
-                        Infolists\Components\TextEntry::make('portfolio_url')
-                            ->label('Portfolio')
-                            ->url(true)
-                            ->openUrlInNewTab()
-                            ->placeholder('Not provided')
-                            ->icon('heroicon-o-link'),
-                        Infolists\Components\TextEntry::make('github_url')
-                            ->label('GitHub')
-                            ->url(true)
-                            ->openUrlInNewTab()
-                            ->placeholder('Not provided')
-                            ->icon('heroicon-o-link'),
                     ])
                     ->columns(1)
                     ->collapsible(),
@@ -331,7 +310,7 @@ class JobApplicationResource extends Resource
                 Infolists\Components\Section::make('Resume & Documents')
                     ->schema(function (JobApplication $record) {
                         $schema = [];
-                        
+
                         // Display resume if exists
                         $resumeMedia = $record->getFirstMedia('resume');
                         if ($resumeMedia) {
@@ -382,7 +361,7 @@ class JobApplicationResource extends Resource
                                 // For file uploads, the answer contains the media ID
                                 $mediaId = $value;
                                 $media = $record->getMedia('custom_questions')->where('id', $mediaId)->first();
-                                
+
                                 if ($media) {
                                     $fields[] = Infolists\Components\TextEntry::make("answer_{$answer->id}")
                                         ->label($question->title)
