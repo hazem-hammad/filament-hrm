@@ -18,9 +18,9 @@ use Maatwebsite\Excel\Concerns\WithValidation;
 use Maatwebsite\Excel\Concerns\WithMultipleSheets;
 use Throwable;
 
-class EmployeeImport implements 
-    ToCollection, 
-    WithHeadingRow, 
+class EmployeeImport implements
+    ToCollection,
+    WithHeadingRow,
     WithValidation
 {
     use Importable;
@@ -51,14 +51,14 @@ class EmployeeImport implements
     {
         // Clean and validate data
         $cleanedRow = $this->cleanRowData($row);
-        
+
         // Validate required fields
         $this->validateRequiredFields($cleanedRow, $rowNumber);
 
         // Find or fail to get department and position
         $department = $this->findDepartment($cleanedRow['department'], $rowNumber);
         $position = $this->findPosition($cleanedRow['position'], $rowNumber);
-        
+
         // Find manager if provided
         $manager = null;
         if (!empty($cleanedRow['manager_email'])) {
@@ -168,7 +168,7 @@ class EmployeeImport implements
     protected function validateRequiredFields(array $row, int $rowNumber): void
     {
         $requiredFields = ['name', 'email', 'phone', 'gender', 'department', 'position'];
-        
+
         foreach ($requiredFields as $field) {
             if (empty($row[$field])) {
                 throw new \Exception("Required field '{$field}' is missing or empty");
@@ -195,7 +195,7 @@ class EmployeeImport implements
     protected function findDepartment(string $departmentName, int $rowNumber): Department
     {
         $department = Department::where('name', 'like', "%{$departmentName}%")->first();
-        
+
         if (!$department) {
             throw new \Exception("Department '{$departmentName}' not found");
         }
@@ -206,7 +206,7 @@ class EmployeeImport implements
     protected function findPosition(string $positionName, int $rowNumber): Position
     {
         $position = Position::where('name', 'like', "%{$positionName}%")->first();
-        
+
         if (!$position) {
             throw new \Exception("Position '{$positionName}' not found");
         }
@@ -217,7 +217,7 @@ class EmployeeImport implements
     protected function findManager(string $managerEmail, int $rowNumber): ?Employee
     {
         $manager = Employee::where('email', $managerEmail)->first();
-        
+
         if (!$manager) {
             Log::warning('Manager not found during import', [
                 'manager_email' => $managerEmail,
@@ -258,10 +258,10 @@ class EmployeeImport implements
                 $employee = $importData['employee'];
                 $password = $importData['password'];
 
-                // Send welcome email with password
+                // Send welcome email with password. Use sendNow to avoid requiring a running queue worker
                 // For the existing notification, we need a password setup token as well
                 $passwordSetupToken = \Illuminate\Support\Str::random(64);
-                Notification::send($employee, new EmployeeWelcomeNotification($password, $passwordSetupToken));
+                Notification::sendNow($employee, new EmployeeWelcomeNotification($password, $passwordSetupToken));
 
                 Log::info('Welcome email sent', [
                     'employee_id' => $employee->employee_id,
