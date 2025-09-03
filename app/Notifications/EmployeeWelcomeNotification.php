@@ -6,7 +6,8 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
-
+use Illuminate\Mail\Mailables\Address;
+ 
 class EmployeeWelcomeNotification extends Notification implements ShouldQueue
 {
     use Queueable;
@@ -33,6 +34,7 @@ class EmployeeWelcomeNotification extends Notification implements ShouldQueue
     {
         return (new MailMessage)
             ->subject('🎉 Welcome to ' . config('app.name') . ' - Your Journey Begins!')
+            ->from(new Address(config('mail.from.address'), get_setting('app_name', 'HRM System')))
             ->view('emails.employee-welcome', [
                 'employee' => $notifiable,
                 'temporaryPassword' => $this->temporaryPassword,

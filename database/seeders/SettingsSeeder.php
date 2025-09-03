@@ -53,6 +53,14 @@ class SettingsSeeder extends Seeder
                 'is_configurable_by_admin' => true,
                 'type' => 'text',
             ],
+            [
+                'group' => 'Careers',
+                'name' => 'App Name',
+                'key' => 'app_name',
+                'value' => null,
+                'is_configurable_by_admin' => true,
+                'type' => 'text',
+            ],
         ];
 
         foreach ($settings as $setting) {
