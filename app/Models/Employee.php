@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use App\Enum\EmployeeLevel;
+use App\Enum\MaritalStatus;
+use App\Enum\ContractType;
 use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -21,15 +23,23 @@ class Employee extends Authenticatable implements HasMedia
     protected $fillable = [
         'name',
         'phone',
+        'business_phone',
         'date_of_birth',
         'gender',
+        'marital_status',
         'email',
+        'personal_email',
+        'national_id',
         'address',
+        'emergency_contact_name',
+        'emergency_contact_relation',
+        'emergency_contact_phone',
         'password',
         'employee_id',
         'department_id',
         'position_id',
         'level',
+        'contract_type',
         'reporting_to',
         'company_date_of_joining',
         'status',
@@ -45,6 +55,8 @@ class Employee extends Authenticatable implements HasMedia
         'date_of_birth' => 'date',
         'company_date_of_joining' => 'date',
         'level' => EmployeeLevel::class,
+        'marital_status' => MaritalStatus::class,
+        'contract_type' => ContractType::class,
         'status' => 'boolean',
         'password_set_at' => 'datetime',
         'email_verified_at' => 'datetime',
@@ -89,6 +101,11 @@ class Employee extends Authenticatable implements HasMedia
     public function assets(): HasMany
     {
         return $this->hasMany(Asset::class, 'assigned_to');
+    }
+
+    public function medicalRecords(): HasMany
+    {
+        return $this->hasMany(MedicalRecord::class);
     }
 
     public function registerMediaCollections(): void

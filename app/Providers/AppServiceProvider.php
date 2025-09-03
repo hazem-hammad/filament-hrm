@@ -26,6 +26,11 @@ class AppServiceProvider extends ServiceProvider
             \App\Repositories\Interfaces\EmployeeOrgChartRepositoryInterface::class,
             \App\Repositories\EmployeeOrgChartRepository::class
         );
+
+        $this->app->bind(
+            \App\Repositories\Interfaces\EmployeeRepositoryInterface::class,
+            \App\Repositories\EmployeeRepository::class
+        );
     }
 
     /**

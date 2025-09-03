@@ -18,6 +18,8 @@ class WorkPlanResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-clock';
 
     protected static ?string $navigationGroup = 'HR Setup';
+    
+    protected static ?int $navigationSort = 4;
 
     public static function form(Form $form): Form
     {

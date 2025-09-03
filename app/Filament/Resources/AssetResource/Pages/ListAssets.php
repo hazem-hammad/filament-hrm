@@ -27,14 +27,6 @@ class ListAssets extends ListRecords
             ->striped()
             ->paginated([10, 25, 50, 100])
             ->columns([
-                Tables\Columns\SpatieMediaLibraryImageColumn::make('images')
-                    ->label('Image')
-                    ->collection('images')
-                    ->conversion('thumb')
-                    ->circular()
-                    ->size(40)
-                    ->defaultImageUrl('/images/asset-placeholder.png'),
-
                 Tables\Columns\TextColumn::make('asset_id')
                     ->label('Asset ID')
                     ->searchable()
@@ -56,11 +48,6 @@ class ListAssets extends ListRecords
                     ->badge()
                     ->color('info'),
 
-                Tables\Columns\TextColumn::make('condition')
-                    ->badge()
-                    ->color(fn(AssetCondition $state): string => $state->color())
-                    ->formatStateUsing(fn(AssetCondition $state): string => $state->label()),
-
                 Tables\Columns\TextColumn::make('status')
                     ->badge()
                     ->color(fn(AssetStatus $state): string => $state->color())
@@ -72,12 +59,6 @@ class ListAssets extends ListRecords
                     ->searchable()
                     ->sortable()
                     ->toggleable(),
-
-                Tables\Columns\TextColumn::make('location')
-                    ->searchable()
-                    ->sortable()
-                    ->toggleable()
-                    ->placeholder('No location'),
 
                 Tables\Columns\TextColumn::make('purchase_cost')
                     ->label('Cost')
@@ -102,11 +83,6 @@ class ListAssets extends ListRecords
                     ->falseColor('danger')
                     ->tooltip(fn(Asset $record): string => $record->warranty_expires_at ? "Expires: {$record->warranty_expires_at->format('M d, Y')}" : 'No warranty info')
                     ->toggleable(),
-
-                Tables\Columns\IconColumn::make('is_active')
-                    ->label('Active')
-                    ->boolean()
-                    ->sortable(),
 
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
@@ -188,12 +164,6 @@ class ListAssets extends ListRecords
                         });
                     }),
 
-                Tables\Filters\TernaryFilter::make('is_active')
-                    ->label('Active Status')
-                    ->boolean()
-                    ->trueLabel('Active')
-                    ->falseLabel('Inactive')
-                    ->native(false),
             ], layout: Tables\Enums\FiltersLayout::AboveContentCollapsible)
             ->actions([
                 Tables\Actions\ActionGroup::make([

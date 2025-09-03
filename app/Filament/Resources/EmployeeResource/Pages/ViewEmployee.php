@@ -4,6 +4,8 @@ namespace App\Filament\Resources\EmployeeResource\Pages;
 
 use App\Filament\Resources\EmployeeResource;
 use App\Http\Resources\MediaResource;
+use App\Enum\MaritalStatus;
+use App\Enum\ContractType;
 use Filament\Actions\EditAction;
 use Filament\Infolists\Components;
 use Filament\Infolists\Infolist;
@@ -52,6 +54,20 @@ class ViewEmployee extends ViewRecord
                                     ->label('Phone Number')
                                     ->icon('heroicon-o-phone')
                                     ->copyable(),
+                                Components\TextEntry::make('business_phone')
+                                    ->label('Business Phone')
+                                    ->icon('heroicon-o-phone')
+                                    ->copyable()
+                                    ->placeholder('Not provided'),
+                                Components\TextEntry::make('personal_email')
+                                    ->label('Personal Email')
+                                    ->icon('heroicon-o-envelope')
+                                    ->copyable()
+                                    ->placeholder('Not provided'),
+                                Components\TextEntry::make('national_id')
+                                    ->label('National ID Number')
+                                    ->icon('heroicon-o-identification')
+                                    ->copyable(),
                                 Components\TextEntry::make('date_of_birth')
                                     ->label('Date of Birth')
                                     ->date()
@@ -65,12 +81,41 @@ class ViewEmployee extends ViewRecord
                                         default => 'gray',
                                     })
                                     ->formatStateUsing(fn(string $state): string => ucfirst($state)),
+                                Components\TextEntry::make('marital_status')
+                                    ->label('Marital Status')
+                                    ->badge()
+                                    ->color(fn(MaritalStatus $state): string => match($state) {
+                                        MaritalStatus::SINGLE => 'gray',
+                                        MaritalStatus::MARRIED => 'success',
+                                    })
+                                    ->formatStateUsing(fn(MaritalStatus $state): string => $state->label()),
                                 Components\TextEntry::make('address')
                                     ->label('Address')
                                     ->icon('heroicon-o-map-pin')
                                     ->columnSpanFull(),
                             ])
                             ->columns(2),
+
+                        // Emergency Contact Section
+                        Components\Section::make('Emergency Contact')
+                            ->schema([
+                                Components\TextEntry::make('emergency_contact_name')
+                                    ->label('Contact Name')
+                                    ->icon('heroicon-o-user')
+                                    ->placeholder('Not provided'),
+                                Components\TextEntry::make('emergency_contact_relation')
+                                    ->label('Relationship')
+                                    ->icon('heroicon-o-heart')
+                                    ->placeholder('Not provided'),
+                                Components\TextEntry::make('emergency_contact_phone')
+                                    ->label('Contact Phone')
+                                    ->icon('heroicon-o-phone')
+                                    ->copyable()
+                                    ->placeholder('Not provided')
+                                    ->columnSpanFull(),
+                            ])
+                            ->columns(2)
+                            ->visible(fn($record) => !empty($record->emergency_contact_name) || !empty($record->emergency_contact_relation) || !empty($record->emergency_contact_phone)),
 
                         // Company Details Section
                         Components\Section::make('Company Details')
@@ -85,6 +130,23 @@ class ViewEmployee extends ViewRecord
                                     ->badge()
                                     ->color('warning')
                                     ->icon('heroicon-o-briefcase'),
+                                Components\TextEntry::make('level')
+                                    ->label('Employee Level')
+                                    ->badge()
+                                    ->color('info')
+                                    ->formatStateUsing(fn($state): string => $state->label()),
+                                Components\TextEntry::make('contract_type')
+                                    ->label('Contract Type')
+                                    ->badge()
+                                    ->color(fn(ContractType $state): string => match($state) {
+                                        ContractType::PERMANENT => 'success',
+                                        ContractType::FULLTIME => 'info',
+                                        ContractType::PARTTIME => 'warning',
+                                        ContractType::FREELANCE => 'gray',
+                                        ContractType::CREDIT_HOURS => 'purple',
+                                        ContractType::INTERNSHIP => 'orange',
+                                    })
+                                    ->formatStateUsing(fn(ContractType $state): string => $state->label()),
                                 Components\TextEntry::make('manager.name')
                                     ->label('Reports To (Manager)')
                                     ->placeholder('No Manager Assigned')
@@ -229,6 +291,7 @@ class ViewEmployee extends ViewRecord
                             ])
                             ->columnSpanFull()
                             ->visible(fn($record) => $record->assets->count() > 0),
+
 
                         // Team Members Section (for managers)
                         Components\Section::make('Team Members')

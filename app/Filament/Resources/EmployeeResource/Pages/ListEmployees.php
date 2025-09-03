@@ -3,6 +3,8 @@
 namespace App\Filament\Resources\EmployeeResource\Pages;
 
 use App\Enum\EmployeeLevel;
+use App\Enum\MaritalStatus;
+use App\Enum\ContractType;
 use App\Filament\Resources\EmployeeResource;
 use App\Imports\EmployeeImport;
 use App\Models\Employee;
@@ -61,6 +63,22 @@ class ListEmployees extends ListRecords
                     ->sortable()
                     ->copyable()
                     ->toggleable(),
+                Tables\Columns\TextColumn::make('national_id')
+                    ->label('National ID')
+                    ->searchable()
+                    ->sortable()
+                    ->copyable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('marital_status')
+                    ->label('Marital Status')
+                    ->formatStateUsing(fn(MaritalStatus $state): string => $state->label())
+                    ->badge()
+                    ->color(fn(MaritalStatus $state): string => match($state) {
+                        MaritalStatus::SINGLE => 'gray',
+                        MaritalStatus::MARRIED => 'success',
+                    })
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('department.name')
                     ->label('Department')
                     ->searchable()
@@ -72,6 +90,20 @@ class ListEmployees extends ListRecords
                     ->searchable()
                     ->sortable()
                     ->description(fn(Employee $record): string => $record->level->label()),
+                Tables\Columns\TextColumn::make('contract_type')
+                    ->label('Contract Type')
+                    ->formatStateUsing(fn(ContractType $state): string => $state->label())
+                    ->badge()
+                    ->color(fn(ContractType $state): string => match($state) {
+                        ContractType::PERMANENT => 'success',
+                        ContractType::FULLTIME => 'info',
+                        ContractType::PARTTIME => 'warning',
+                        ContractType::FREELANCE => 'gray',
+                        ContractType::CREDIT_HOURS => 'purple',
+                        ContractType::INTERNSHIP => 'orange',
+                    })
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('manager.name')
                     ->label('Reports To')
                     ->placeholder('No Manager')
@@ -182,6 +214,18 @@ class ListEmployees extends ListRecords
                         'female' => 'Female',
                     ])
                     ->native(false),
+                Tables\Filters\SelectFilter::make('marital_status')
+                    ->label('Marital Status')
+                    ->options(MaritalStatus::options())
+                    ->searchable()
+                    ->native(false)
+                    ->multiple(),
+                Tables\Filters\SelectFilter::make('contract_type')
+                    ->label('Contract Type')
+                    ->options(ContractType::options())
+                    ->searchable()
+                    ->native(false)
+                    ->multiple(),
                 Tables\Filters\TernaryFilter::make('status')
                     ->boolean()
                     ->trueLabel('Active')

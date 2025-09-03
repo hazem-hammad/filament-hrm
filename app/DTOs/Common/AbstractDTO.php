@@ -29,6 +29,7 @@ abstract class AbstractDTO implements DtoInterface
         }
 
         $this->setupFilters($data);
+        $this->setupIncludes($data);
     }
 
     abstract protected function map(array $data): bool;

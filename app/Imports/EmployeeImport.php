@@ -5,6 +5,8 @@ namespace App\Imports;
 use App\Models\Department;
 use App\Models\Employee;
 use App\Models\Position;
+use App\Enum\MaritalStatus;
+use App\Enum\ContractType;
 use App\Notifications\EmployeeWelcomeNotification;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Hash;
@@ -15,7 +17,6 @@ use Maatwebsite\Excel\Concerns\Importable;
 use Maatwebsite\Excel\Concerns\ToCollection;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Maatwebsite\Excel\Concerns\WithValidation;
-use Maatwebsite\Excel\Concerns\WithMultipleSheets;
 use Throwable;
 
 class EmployeeImport implements
@@ -87,14 +88,22 @@ class EmployeeImport implements
         $employee = Employee::create([
             'name' => $cleanedRow['name'],
             'email' => $cleanedRow['email'],
+            'personal_email' => $cleanedRow['personal_email'] ?: null,
             'phone' => $cleanedRow['phone'],
+            'business_phone' => $cleanedRow['business_phone'] ?: null,
             'gender' => $cleanedRow['gender'],
+            'marital_status' => $cleanedRow['marital_status'],
+            'national_id' => $cleanedRow['national_id'],
             'date_of_birth' => $cleanedRow['date_of_birth'],
             'address' => $cleanedRow['address'],
+            'emergency_contact_name' => $cleanedRow['emergency_contact_name'] ?: null,
+            'emergency_contact_relation' => $cleanedRow['emergency_contact_relation'] ?: null,
+            'emergency_contact_phone' => $cleanedRow['emergency_contact_phone'] ?: null,
             'employee_id' => $cleanedRow['employee_id'],
             'department_id' => $department->id,
             'position_id' => $position->id,
             'level' => $cleanedRow['employee_level'] ?? 'junior',
+            'contract_type' => $cleanedRow['contract_type'],
             'reporting_to' => $manager?->id,
             'company_date_of_joining' => $cleanedRow['company_joining_date'],
             'password' => $hashedPassword,
@@ -121,14 +130,22 @@ class EmployeeImport implements
         return [
             'name' => trim($row['name'] ?? ''),
             'email' => strtolower(trim($row['email'] ?? '')),
+            'personal_email' => strtolower(trim($row['personal_email'] ?? '')),
             'phone' => trim(strval($row['phone'] ?? '')), // Convert to string to handle numeric phones
+            'business_phone' => trim(strval($row['business_phone'] ?? '')),
             'gender' => strtolower(trim($row['gender'] ?? '')),
+            'marital_status' => strtolower(trim($row['marital_status'] ?? 'single')),
+            'national_id' => trim($row['national_id'] ?? ''),
             'date_of_birth' => $this->parseDate($row['date_of_birth'] ?? ''),
             'address' => trim($row['address'] ?? ''),
+            'emergency_contact_name' => trim($row['emergency_contact_name'] ?? ''),
+            'emergency_contact_relation' => trim($row['emergency_contact_relation'] ?? ''),
+            'emergency_contact_phone' => trim(strval($row['emergency_contact_phone'] ?? '')),
             'employee_id' => trim($row['employee_id'] ?? ''),
             'department' => trim($row['department'] ?? ''),
             'position' => trim($row['position'] ?? ''),
             'employee_level' => strtolower(trim($row['employee_level'] ?? 'junior')),
+            'contract_type' => strtolower(trim($row['contract_type'] ?? 'permanent')),
             'manager_email' => strtolower(trim($row['manager_email'] ?? '')),
             'company_joining_date' => $this->parseDate($row['company_joining_date'] ?? ''),
         ];
@@ -167,7 +184,7 @@ class EmployeeImport implements
 
     protected function validateRequiredFields(array $row, int $rowNumber): void
     {
-        $requiredFields = ['name', 'email', 'phone', 'gender', 'department', 'position'];
+        $requiredFields = ['name', 'email', 'phone', 'gender', 'marital_status', 'national_id', 'department', 'position', 'contract_type'];
 
         foreach ($requiredFields as $field) {
             if (empty($row[$field])) {
@@ -183,6 +200,18 @@ class EmployeeImport implements
         // Validate gender
         if (!in_array($row['gender'], ['male', 'female'])) {
             throw new \Exception("Gender must be 'male' or 'female', got: {$row['gender']}");
+        }
+
+        // Validate marital status
+        $validMaritalStatuses = array_keys(MaritalStatus::options());
+        if (!in_array($row['marital_status'], $validMaritalStatuses)) {
+            throw new \Exception("Invalid marital status: {$row['marital_status']}. Must be one of: " . implode(', ', $validMaritalStatuses));
+        }
+
+        // Validate contract type
+        $validContractTypes = array_keys(ContractType::options());
+        if (!in_array($row['contract_type'], $validContractTypes)) {
+            throw new \Exception("Invalid contract type: {$row['contract_type']}. Must be one of: " . implode(', ', $validContractTypes));
         }
 
         // Validate employee level
@@ -281,10 +310,18 @@ class EmployeeImport implements
         return [
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'unique:employees,email'],
+            'personal_email' => ['nullable', 'email'],
             'phone' => ['required', 'max:20'], // Remove string validation since Excel converts it to number
+            'business_phone' => ['nullable', 'max:20'],
             'gender' => ['required', 'in:male,female'],
-            'department' => ['required', 'string'],
-            'position' => ['required', 'string'],
+            'marital_status' => ['required', 'in:' . implode(',', array_keys(MaritalStatus::options()))],
+            'national_id' => ['required', 'max:255'],
+            'emergency_contact_name' => ['nullable', 'max:255'],
+            'emergency_contact_relation' => ['nullable', 'max:255'],
+            'emergency_contact_phone' => ['nullable', 'max:20'],
+            'contract_type' => ['required', 'in:' . implode(',', array_keys(ContractType::options()))],
+            'department' => ['required', 'max:255'],
+            'position' => ['required', 'max:255'],
         ];
     }
 

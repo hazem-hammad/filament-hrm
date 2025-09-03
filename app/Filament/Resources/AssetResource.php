@@ -17,7 +17,9 @@ class AssetResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-computer-desktop';
 
-    protected static ?string $navigationGroup = 'Asset Management';
+    protected static ?string $navigationGroup = 'HR Setup';
+    
+    protected static ?int $navigationSort = 5;
 
     public static function form(Form $form): Form
     {
@@ -158,10 +160,6 @@ class AssetResource extends Resource
                                     ->placeholder('Enter asset location')
                                     ->maxLength(255),
 
-                                Forms\Components\Toggle::make('is_active')
-                                    ->label('Active')
-                                    ->default(true)
-                                    ->helperText('Inactive assets will not be available for assignment'),
                             ])
                             ->columns(2),
 

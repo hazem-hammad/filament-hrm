@@ -3,7 +3,16 @@
 use App\Http\Controllers\CareerController;
 use App\Http\Controllers\SetupController;
 use App\Http\Controllers\EmployeePasswordSetupController;
+use App\Http\Controllers\EmployeeRegistrationController;
 use Illuminate\Support\Facades\Route;
+
+// Employee registration routes (public)
+Route::get('/employee/register', [EmployeeRegistrationController::class, 'showRegistrationForm'])
+    ->name('employee.registration.form');
+Route::post('/employee/register', [EmployeeRegistrationController::class, 'register'])
+    ->name('employee.registration.submit');
+Route::get('/employee/registration/success', [EmployeeRegistrationController::class, 'success'])
+    ->name('employee.registration.success');
 
 // Employee password setup routes
 Route::get('/employee/setup-password/{token}', [EmployeePasswordSetupController::class, 'showSetupForm'])

@@ -19,6 +19,8 @@ class DocumentFolderResource extends Resource
 
     protected static ?string $navigationGroup = 'HR Setup';
     
+    protected static ?int $navigationSort = 3;
+    
     protected static ?string $navigationLabel = 'Document Manager';
 
     public static function form(Form $form): Form

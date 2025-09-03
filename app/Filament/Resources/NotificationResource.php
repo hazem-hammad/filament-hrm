@@ -16,6 +16,8 @@ class NotificationResource extends Resource
     protected static ?string $model = NotificationCenter::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-bell';
+    
+    protected static bool $shouldRegisterNavigation = false;
 
     public static function getNavigationGroup(): ?string
     {
