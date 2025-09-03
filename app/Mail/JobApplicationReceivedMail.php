@@ -9,7 +9,6 @@ use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Mail\Mailables\Address;
 
 class JobApplicationReceivedMail extends Mailable implements ShouldQueue
 {
@@ -31,7 +30,7 @@ class JobApplicationReceivedMail extends Mailable implements ShouldQueue
     {
         return new Envelope(
             subject: 'New Job Application Received - ' . $this->jobApplication->job->title,
-            from: new Address(config('mail.from.address'), get_setting('app_name', 'HRM System')),
+            from: [config('mail.from.address'), get_setting('app_name', 'HRM System')],
         );
     }
 

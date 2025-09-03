@@ -7,7 +7,6 @@ use App\Models\JobStage;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
-use Illuminate\Mail\Mailables\Address;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
@@ -33,7 +32,7 @@ class JobStageUpdateMail extends Mailable implements ShouldQueue
     {
         return new Envelope(
             subject: 'Update on Your Application for ' . $this->jobApplication->job->title,
-            from: new Address(config('mail.from.address'), get_setting('app_name', 'HRM System')),
+            from: [config('mail.from.address'), get_setting('app_name', 'HRM System')],
         );
     }
 
