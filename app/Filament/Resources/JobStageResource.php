@@ -40,8 +40,14 @@ class JobStageResource extends Resource
                     ])
                     ->columns(3),
 
-                Forms\Components\Section::make('Email Template')
+                Forms\Components\Section::make('Email Notifications')
                     ->schema([
+                        Forms\Components\Toggle::make('sending_email')
+                            ->label('Send Email Notifications')
+                            ->helperText('When enabled, applicants will receive email notifications when they reach this stage.')
+                            ->default(true)
+                            ->live()
+                            ->columnSpanFull(),
                         Forms\Components\RichEditor::make('email_template')
                             ->label('Email Template')
                             ->helperText('Email template sent to applicants when they reach this stage. Use {first_name}, {last_name}, {job_title}, and {stage_name} as placeholders.')
@@ -56,6 +62,7 @@ class JobStageResource extends Resource
                                 'h3',
                                 'blockquote',
                             ])
+                            ->visible(fn(Forms\Get $get): bool => $get('sending_email'))
                             ->columnSpanFull(),
                     ]),
             ]);

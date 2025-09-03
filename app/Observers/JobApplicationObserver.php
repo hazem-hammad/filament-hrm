@@ -43,7 +43,7 @@ class JobApplicationObserver
         
         $newStage = JobStage::find($jobApplication->job_stage_id);
         
-        if ($newStage && $newStage->status && $jobApplication->job) {
+        if ($newStage && $newStage->status && $newStage->sending_email && $jobApplication->job) {
             $notifiable = new ApplicantNotifiable(
                 $jobApplication->email,
                 $jobApplication->full_name
@@ -58,6 +58,12 @@ class JobApplicationObserver
                     'error' => $e->getMessage()
                 ]);
             }
+        } elseif ($newStage && $newStage->status && !$newStage->sending_email) {
+            Log::info('Email notification skipped for job stage (sending_email disabled)', [
+                'job_application_id' => $jobApplication->id,
+                'stage_id' => $newStage->id,
+                'stage_name' => $newStage->name
+            ]);
         }
     }
 

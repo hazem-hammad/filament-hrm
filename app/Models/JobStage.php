@@ -13,10 +13,12 @@ class JobStage extends Model
         'status',
         'sort',
         'email_template',
+        'sending_email',
     ];
 
     protected $casts = [
         'status' => 'boolean',
+        'sending_email' => 'boolean',
         'sort' => 'integer',
     ];
 
