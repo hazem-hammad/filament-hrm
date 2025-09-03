@@ -140,7 +140,6 @@ class ViewDocumentFolder extends ViewRecord
                             'application/zip',
                         ])
                         ->maxSize(50 * 1024)
-                        ->disk('public')
                         ->directory('documents')
                         ->storeFileNamesIn('original_filename'),
 

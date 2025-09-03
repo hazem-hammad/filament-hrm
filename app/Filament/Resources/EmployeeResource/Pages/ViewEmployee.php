@@ -189,7 +189,7 @@ class ViewEmployee extends ViewRecord
                                             ->label('Asset Name')
                                             ->icon('heroicon-o-computer-desktop')
                                             ->weight('medium')
-                                            ->description(fn($record) => $record->brand && $record->model ? "{$record->brand} {$record->model}" : null),
+                                            ->helperText(fn($record) => $record->brand && $record->model ? "{$record->brand} {$record->model}" : null),
                                         Components\TextEntry::make('category')
                                             ->label('Category')
                                             ->badge()

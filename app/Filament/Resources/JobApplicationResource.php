@@ -145,7 +145,6 @@ class JobApplicationResource extends Resource
                                     ->maxLength(1000),
                                 'file_upload' => Forms\Components\FileUpload::make("question_{$question->id}")
                                     ->label($question->title)
-                                    ->disk('public')
                                     ->directory('application-files'),
                                 'toggle' => Forms\Components\Toggle::make("question_{$question->id}")
                                     ->label($question->title),
