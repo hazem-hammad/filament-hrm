@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Welcome to {{ $companyName }}</title>
+    <title>Welcome to {{ get_setting('app_name', 'HRM System') }}</title>
     <style>
         * {
             margin: 0;
@@ -30,7 +30,7 @@
         }
 
         .header {
-            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            background: #10b981;
             padding: 40px 30px;
             text-align: center;
         }
@@ -140,7 +140,7 @@
         }
 
         .password-card {
-            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            background: #8b5cf6;
             color: white;
         }
 
@@ -299,7 +299,7 @@
         <!-- Header Section -->
         <div class="header">
             <div class="welcome-badge">🎉 New Employee</div>
-            <h1 class="welcome-title">Welcome to {{ $companyName }}!</h1>
+            <h1 class="welcome-title">Welcome to {{ get_setting('app_name', 'HRM System') }}!</h1>
             <p class="welcome-subtitle">Your amazing journey starts here</p>
         </div>
 
@@ -379,7 +379,7 @@
                 Need help getting started? Our HR team is here to support you every step of the way.
             </div>
             <div class="contact-info">
-                🏢 {{ $companyName }} - Human Resources Department
+                🏢 {{ get_setting('app_name', 'HRM System') }} - Human Resources Department
             </div>
         </div>
     </div>
