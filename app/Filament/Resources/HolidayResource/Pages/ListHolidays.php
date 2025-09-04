@@ -17,28 +17,28 @@ class ListHolidays extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Action::make('import_holidays')
-                ->label('Import Holidays')
-                ->icon('heroicon-o-arrow-up-tray')
-                ->color('info')
-                ->form([
-                    Forms\Components\FileUpload::make('file')
-                        ->label('CSV File')
-                        ->acceptedFileTypes(['text/csv', 'application/csv'])
-                        ->required()
-                        ->helperText('Upload a CSV file with columns: name, description, start_date, end_date, type, is_paid'),
-                ])
-                ->action(function (array $data) {
-                    $this->importHolidays($data['file']);
-                }),
+            // Action::make('import_holidays')
+            //     ->label('Import Holidays')
+            //     ->icon('heroicon-o-arrow-up-tray')
+            //     ->color('info')
+            //     ->form([
+            //         Forms\Components\FileUpload::make('file')
+            //             ->label('CSV File')
+            //             ->acceptedFileTypes(['text/csv', 'application/csv'])
+            //             ->required()
+            //             ->helperText('Upload a CSV file with columns: name, description, start_date, end_date, type, is_paid'),
+            //     ])
+            //     ->action(function (array $data) {
+            //         $this->importHolidays($data['file']);
+            //     }),
 
-            Action::make('export_holidays')
-                ->label('Export Holidays')
-                ->icon('heroicon-o-arrow-down-tray')
-                ->color('success')
-                ->action(function () {
-                    return $this->exportHolidays();
-                }),
+            // Action::make('export_holidays')
+            //     ->label('Export Holidays')
+            //     ->icon('heroicon-o-arrow-down-tray')
+            //     ->color('success')
+            //     ->action(function () {
+            //         return $this->exportHolidays();
+            //     }),
 
             Actions\CreateAction::make()
                 ->icon('heroicon-o-plus'),
@@ -51,17 +51,17 @@ class ListHolidays extends ListRecords
             $path = storage_path('app/' . $filePath);
             $csvData = array_map('str_getcsv', file($path));
             $header = array_shift($csvData);
-            
+
             $imported = 0;
             foreach ($csvData as $row) {
                 $data = array_combine($header, $row);
-                
+
                 Holiday::create([
                     'name' => $data['name'] ?? '',
                     'description' => $data['description'] ?? null,
                     'start_date' => $data['start_date'] ?? null,
                     'end_date' => $data['end_date'] ?? null,
-                    'type' => in_array($data['type'] ?? '', ['public', 'religious', 'national', 'company']) 
+                    'type' => in_array($data['type'] ?? '', ['public', 'religious', 'national', 'company'])
                         ? $data['type'] : 'public',
                     'is_paid' => filter_var($data['is_paid'] ?? true, FILTER_VALIDATE_BOOLEAN),
                     'status' => true,
@@ -87,9 +87,9 @@ class ListHolidays extends ListRecords
     protected function exportHolidays()
     {
         $holidays = Holiday::all();
-        
+
         $csvData = "name,description,start_date,end_date,type,is_paid,is_recurring,color,status\n";
-        
+
         foreach ($holidays as $holiday) {
             $csvData .= sprintf(
                 "\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\"\n",

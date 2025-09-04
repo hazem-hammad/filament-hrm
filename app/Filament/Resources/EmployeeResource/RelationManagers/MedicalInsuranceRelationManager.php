@@ -12,13 +12,13 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
-class MedicalRecordsRelationManager extends RelationManager
+class MedicalInsuranceRelationManager extends RelationManager
 {
-    protected static string $relationship = 'medicalRecords';
+    protected static string $relationship = 'medicalInsurance';
 
     protected static ?string $recordTitleAttribute = 'insurance_number';
 
-    protected static ?string $title = 'Medical Records';
+    protected static ?string $title = 'Medical Insurance';
 
     public function form(Form $form): Form
     {

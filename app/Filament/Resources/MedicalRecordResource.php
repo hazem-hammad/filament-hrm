@@ -20,11 +20,21 @@ class MedicalRecordResource extends Resource
 {
     protected static ?string $model = MedicalRecord::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-heart';
+    protected static ?string $navigationIcon = 'heroicon-o-shield-check';
     
     protected static ?string $navigationGroup = 'Employees';
     
     protected static ?int $navigationSort = 2;
+    
+    public static function getModelLabel(): string
+    {
+        return 'Medical Insurance';
+    }
+    
+    public static function getPluralModelLabel(): string
+    {
+        return 'Medical Insurance';
+    }
 
     public static function form(Form $form): Form
     {
@@ -34,7 +44,7 @@ class MedicalRecordResource extends Resource
                     ->schema([
                         // Employee Selection Section
                         Forms\Components\Section::make('Employee Information')
-                            ->description('Select the employee for this medical record')
+                            ->description('Select the employee for this medical insurance')
                             ->icon('heroicon-o-user')
                             ->schema([
                                 Forms\Components\Select::make('employee_id')
@@ -46,7 +56,7 @@ class MedicalRecordResource extends Resource
                                     ->required()
                                     ->default(fn() => request()->get('employee_id'))
                                     ->disabled(fn() => request()->has('employee_id'))
-                                    ->helperText('Choose the employee this medical record belongs to'),
+                                    ->helperText('Choose the employee this medical insurance belongs to'),
                             ])
                             ->columnSpan(['lg' => 1]),
                             

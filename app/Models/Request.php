@@ -7,9 +7,13 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
-class Request extends Model
+class Request extends Model implements HasMedia
 {
+    use InteractsWithMedia;
     protected $fillable = [
         'employee_id',
         'request_type',
@@ -27,6 +31,7 @@ class Request extends Model
         'end_time',
         'approved_by',
         'approved_at',
+        'escalate_to',
     ];
 
     protected $casts = [
@@ -62,6 +67,11 @@ class Request extends Model
     public function approver(): BelongsTo
     {
         return $this->belongsTo(Employee::class, 'approved_by');
+    }
+
+    public function escalatedTo(): BelongsTo
+    {
+        return $this->belongsTo(Employee::class, 'escalate_to');
     }
 
     public function requestable(): MorphTo
@@ -303,5 +313,19 @@ class Request extends Model
             'attendance' => 'primary',
             default => 'gray',
         };
+    }
+
+    public function registerMediaCollections(): void
+    {
+        $this->addMediaCollection('request_attachments')
+            ->acceptsMimeTypes([
+                'application/pdf',
+                'image/jpeg',
+                'image/jpg', 
+                'image/png',
+                'application/msword',
+                'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+            ])
+            ->singleFile(false);
     }
 }

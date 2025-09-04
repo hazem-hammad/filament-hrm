@@ -103,7 +103,7 @@ class Employee extends Authenticatable implements HasMedia
         return $this->hasMany(Asset::class, 'assigned_to');
     }
 
-    public function medicalRecords(): HasMany
+    public function medicalInsurance(): HasMany
     {
         return $this->hasMany(MedicalRecord::class);
     }

@@ -44,18 +44,18 @@ class ListAttendances extends ListRecords
                     ->time('H:i')
                     ->placeholder('Not checked out')
                     ->sortable(),
-                Tables\Columns\TextColumn::make('working_hours_label')
-                    ->label('Working Hours')
-                    ->badge()
-                    ->color('success'),
-                Tables\Columns\TextColumn::make('missing_hours_label')
-                    ->label('Missing Hours')
-                    ->badge()
-                    ->color(fn($record): string => $record->missing_hours > 0 ? 'danger' : 'success'),
-                Tables\Columns\TextColumn::make('late_minutes_label')
-                    ->label('Status')
-                    ->badge()
-                    ->color(fn($record): string => $record->late_minutes > 0 ? 'warning' : 'success'),
+                // Tables\Columns\TextColumn::make('working_hours_label')
+                //     ->label('Working Hours')
+                //     ->badge()
+                //     ->color('success'),
+                // Tables\Columns\TextColumn::make('missing_hours_label')
+                //     ->label('Missing Hours')
+                //     ->badge()
+                //     ->color(fn($record): string => $record->missing_hours > 0 ? 'danger' : 'success'),
+                // Tables\Columns\TextColumn::make('late_minutes_label')
+                //     ->label('Status')
+                //     ->badge()
+                //     ->color(fn($record): string => $record->late_minutes > 0 ? 'warning' : 'success'),
                 Tables\Columns\IconColumn::make('is_manual')
                     ->label('Entry Type')
                     ->boolean()
@@ -91,7 +91,7 @@ class ListAttendances extends ListRecords
             ->actions([
                 Tables\Actions\ViewAction::make()
                     ->modalHeading('Attendance Details')
-                    ->modalContent(fn ($record) => view('filament.employee.attendance.view', compact('record')))
+                    ->modalContent(fn($record) => view('filament.employee.attendance.view', compact('record')))
                     ->modalWidth('lg'),
             ])
             ->emptyStateHeading('No Attendance Records')
@@ -102,17 +102,17 @@ class ListAttendances extends ListRecords
     public function getTabs(): array
     {
         $employeeId = auth()->id();
-        
+
         return [
             'all' => Tab::make('All Records')
                 ->badge(Attendance::where('employee_id', $employeeId)->count())
                 ->badgeColor('gray'),
             'this_month' => Tab::make('This Month')
-                ->modifyQueryUsing(fn (Builder $query) => $query->whereMonth('date', now()->month)->whereYear('date', now()->year))
+                ->modifyQueryUsing(fn(Builder $query) => $query->whereMonth('date', now()->month)->whereYear('date', now()->year))
                 ->badge(Attendance::where('employee_id', $employeeId)->whereMonth('date', now()->month)->whereYear('date', now()->year)->count())
                 ->badgeColor('primary'),
             'this_week' => Tab::make('This Week')
-                ->modifyQueryUsing(fn (Builder $query) => $query->whereBetween('date', [
+                ->modifyQueryUsing(fn(Builder $query) => $query->whereBetween('date', [
                     now()->startOfWeek(),
                     now()->endOfWeek()
                 ]))
@@ -122,7 +122,7 @@ class ListAttendances extends ListRecords
                 ])->count())
                 ->badgeColor('info'),
             'late_records' => Tab::make('Late Records')
-                ->modifyQueryUsing(fn (Builder $query) => $query->where('late_minutes', '>', 0))
+                ->modifyQueryUsing(fn(Builder $query) => $query->where('late_minutes', '>', 0))
                 ->badge(Attendance::where('employee_id', $employeeId)->where('late_minutes', '>', 0)->count())
                 ->badgeColor('warning'),
         ];

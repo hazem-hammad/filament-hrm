@@ -249,7 +249,7 @@ class EmployeeResource extends Resource
     public static function getRelations(): array
     {
         return [
-            \App\Filament\Resources\EmployeeResource\RelationManagers\MedicalRecordsRelationManager::class,
+            \App\Filament\Resources\EmployeeResource\RelationManagers\MedicalInsuranceRelationManager::class,
         ];
     }
 

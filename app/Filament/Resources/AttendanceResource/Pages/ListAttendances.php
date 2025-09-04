@@ -47,21 +47,21 @@ class ListAttendances extends ListRecords
                     ->time('H:i')
                     ->placeholder('Not checked out')
                     ->sortable(),
-                Tables\Columns\TextColumn::make('working_hours_label')
-                    ->label('Working Hours')
-                    ->badge()
-                    ->color('success')
-                    ->sortable('working_hours'),
-                Tables\Columns\TextColumn::make('missing_hours_label')
-                    ->label('Missing Hours')
-                    ->badge()
-                    ->color(fn($record): string => $record->missing_hours > 0 ? 'danger' : 'success')
-                    ->sortable('missing_hours'),
-                Tables\Columns\TextColumn::make('late_minutes_label')
-                    ->label('Late Status')
-                    ->badge()
-                    ->color(fn($record): string => $record->late_minutes > 0 ? 'warning' : 'success')
-                    ->sortable('late_minutes'),
+                // Tables\Columns\TextColumn::make('working_hours_label')
+                //     ->label('Working Hours')
+                //     ->badge()
+                //     ->color('success')
+                //     ->sortable('working_hours'),
+                // Tables\Columns\TextColumn::make('missing_hours_label')
+                //     ->label('Missing Hours')
+                //     ->badge()
+                //     ->color(fn($record): string => $record->missing_hours > 0 ? 'danger' : 'success')
+                //     ->sortable('missing_hours'),
+                // Tables\Columns\TextColumn::make('late_minutes_label')
+                //     ->label('Late Status')
+                //     ->badge()
+                //     ->color(fn($record): string => $record->late_minutes > 0 ? 'warning' : 'success')
+                //     ->sortable('late_minutes'),
                 Tables\Columns\IconColumn::make('is_manual')
                     ->label('Manual')
                     ->boolean()
@@ -135,11 +135,11 @@ class ListAttendances extends ListRecords
                 ->badge(Attendance::count())
                 ->badgeColor('gray'),
             'today' => Tab::make("Today's Attendance")
-                ->modifyQueryUsing(fn (Builder $query) => $query->whereDate('date', today()))
+                ->modifyQueryUsing(fn(Builder $query) => $query->whereDate('date', today()))
                 ->badge(Attendance::whereDate('date', today())->count())
                 ->badgeColor('primary'),
             'this_week' => Tab::make('This Week')
-                ->modifyQueryUsing(fn (Builder $query) => $query->whereBetween('date', [
+                ->modifyQueryUsing(fn(Builder $query) => $query->whereBetween('date', [
                     now()->startOfWeek(),
                     now()->endOfWeek()
                 ]))
@@ -149,11 +149,11 @@ class ListAttendances extends ListRecords
                 ])->count())
                 ->badgeColor('info'),
             'late_today' => Tab::make('Late Today')
-                ->modifyQueryUsing(fn (Builder $query) => $query->whereDate('date', today())->where('late_minutes', '>', 0))
+                ->modifyQueryUsing(fn(Builder $query) => $query->whereDate('date', today())->where('late_minutes', '>', 0))
                 ->badge(Attendance::whereDate('date', today())->where('late_minutes', '>', 0)->count())
                 ->badgeColor('warning'),
             'missing_hours' => Tab::make('Missing Hours')
-                ->modifyQueryUsing(fn (Builder $query) => $query->where('missing_hours', '>', 0))
+                ->modifyQueryUsing(fn(Builder $query) => $query->where('missing_hours', '>', 0))
                 ->badge(Attendance::where('missing_hours', '>', 0)->count())
                 ->badgeColor('danger'),
         ];

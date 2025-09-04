@@ -37,20 +37,20 @@ class AttendanceStatsWidget extends BaseWidget
                 ->descriptionIcon('heroicon-m-calendar-days')
                 ->color('success'),
                 
-            Stat::make('Late Days This Month', $lateDaysThisMonth)
-                ->description($lateDaysThisMonth > 0 ? 'Try to improve punctuality' : 'Great punctuality!')
-                ->descriptionIcon('heroicon-m-clock')
-                ->color($lateDaysThisMonth > 0 ? 'warning' : 'success'),
+            // Stat::make('Late Days This Month', $lateDaysThisMonth)
+            //     ->description($lateDaysThisMonth > 0 ? 'Try to improve punctuality' : 'Great punctuality!')
+            //     ->descriptionIcon('heroicon-m-clock')
+            //     ->color($lateDaysThisMonth > 0 ? 'warning' : 'success'),
                 
-            Stat::make('Working Hours (Month)', number_format($totalWorkingHours, 1) . 'h')
-                ->description('Total hours worked this month')
-                ->descriptionIcon('heroicon-m-briefcase')
-                ->color('info'),
+            // Stat::make('Working Hours (Month)', number_format($totalWorkingHours, 1) . 'h')
+            //     ->description('Total hours worked this month')
+            //     ->descriptionIcon('heroicon-m-briefcase')
+            //     ->color('info'),
                 
-            Stat::make('Missing Hours (Month)', number_format($totalMissingHours, 1) . 'h')
-                ->description($totalMissingHours > 0 ? 'Complete your working hours' : 'All hours completed!')
-                ->descriptionIcon('heroicon-m-exclamation-triangle')
-                ->color($totalMissingHours > 0 ? 'danger' : 'success'),
+            // Stat::make('Missing Hours (Month)', number_format($totalMissingHours, 1) . 'h')
+            //     ->description($totalMissingHours > 0 ? 'Complete your working hours' : 'All hours completed!')
+            //     ->descriptionIcon('heroicon-m-exclamation-triangle')
+            //     ->color($totalMissingHours > 0 ? 'danger' : 'success'),
         ];
     }
     

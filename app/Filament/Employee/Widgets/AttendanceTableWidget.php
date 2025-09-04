@@ -79,17 +79,17 @@ class AttendanceTableWidget extends BaseWidget
                     ->badge()
                     ->color('success'),
 
-                TextColumn::make('late_minutes')
-                    ->label('Late')
-                    ->getStateUsing(
-                        fn(Attendance $record): string =>
-                        $record->late_minutes > 0 ? $record->late_minutes . ' min' : 'On time'
-                    )
-                    ->badge()
-                    ->color(
-                        fn(Attendance $record): string =>
-                        $record->late_minutes > 0 ? 'warning' : 'success'
-                    ),
+                // TextColumn::make('late_minutes')
+                //     ->label('Late')
+                //     ->getStateUsing(
+                //         fn(Attendance $record): string =>
+                //         $record->late_minutes > 0 ? $record->late_minutes . ' min' : 'On time'
+                //     )
+                //     ->badge()
+                //     ->color(
+                //         fn(Attendance $record): string =>
+                //         $record->late_minutes > 0 ? 'warning' : 'success'
+                //     ),
 
                 TextColumn::make('status')
                     ->label('Status')
