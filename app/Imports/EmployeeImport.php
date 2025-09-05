@@ -7,6 +7,7 @@ use App\Models\Employee;
 use App\Models\Position;
 use App\Enum\MaritalStatus;
 use App\Enum\ContractType;
+use App\Enum\SocialInsuranceStatus;
 use App\Notifications\EmployeeWelcomeNotification;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Hash;
@@ -104,6 +105,8 @@ class EmployeeImport implements
             'position_id' => $position->id,
             'level' => $cleanedRow['employee_level'] ?? 'junior',
             'contract_type' => $cleanedRow['contract_type'],
+            'social_insurance_status' => $cleanedRow['social_insurance_status'],
+            'social_insurance_number' => $cleanedRow['social_insurance_number'],
             'reporting_to' => $manager?->id,
             'company_date_of_joining' => $cleanedRow['company_joining_date'],
             'password' => $hashedPassword,
@@ -146,6 +149,8 @@ class EmployeeImport implements
             'position' => trim($row['position'] ?? ''),
             'employee_level' => strtolower(trim($row['employee_level'] ?? 'junior')),
             'contract_type' => strtolower(trim($row['contract_type'] ?? 'permanent')),
+            'social_insurance_status' => strtolower(trim($row['social_insurance_status'] ?? 'not_applicable')),
+            'social_insurance_number' => trim($row['social_insurance_number'] ?? ''),
             'manager_email' => strtolower(trim($row['manager_email'] ?? '')),
             'company_joining_date' => $this->parseDate($row['company_joining_date'] ?? ''),
         ];
@@ -212,6 +217,12 @@ class EmployeeImport implements
         $validContractTypes = array_keys(ContractType::options());
         if (!in_array($row['contract_type'], $validContractTypes)) {
             throw new \Exception("Invalid contract type: {$row['contract_type']}. Must be one of: " . implode(', ', $validContractTypes));
+        }
+
+        // Validate social insurance status
+        $validSocialInsuranceStatuses = array_keys(SocialInsuranceStatus::options());
+        if (!in_array($row['social_insurance_status'], $validSocialInsuranceStatuses)) {
+            throw new \Exception("Invalid social insurance status: {$row['social_insurance_status']}. Must be one of: " . implode(', ', $validSocialInsuranceStatuses));
         }
 
         // Validate employee level
@@ -320,6 +331,8 @@ class EmployeeImport implements
             'emergency_contact_relation' => ['nullable', 'max:255'],
             'emergency_contact_phone' => ['nullable', 'max:20'],
             'contract_type' => ['required', 'in:' . implode(',', array_keys(ContractType::options()))],
+            'social_insurance_status' => ['required', 'in:' . implode(',', array_keys(SocialInsuranceStatus::options()))],
+            'social_insurance_number' => ['nullable', 'max:255'],
             'department' => ['required', 'max:255'],
             'position' => ['required', 'max:255'],
         ];

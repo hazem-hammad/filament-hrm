@@ -2,9 +2,9 @@
 
 namespace App\Enum;
 
-enum InsuranceStatus: string
+enum SocialInsuranceStatus: string
 {
-    case NOT_APPLICABLE = 'n/a';
+    case NOT_APPLICABLE = 'not_applicable';
     case PENDING = 'pending';
     case DONE = 'done';
 

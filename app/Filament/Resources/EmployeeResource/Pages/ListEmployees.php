@@ -5,6 +5,7 @@ namespace App\Filament\Resources\EmployeeResource\Pages;
 use App\Enum\EmployeeLevel;
 use App\Enum\MaritalStatus;
 use App\Enum\ContractType;
+use App\Enum\SocialInsuranceStatus;
 use App\Filament\Resources\EmployeeResource;
 use App\Imports\EmployeeImport;
 use App\Models\Employee;
@@ -104,6 +105,22 @@ class ListEmployees extends ListRecords
                     })
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('social_insurance_status')
+                    ->label('Social Insurance')
+                    ->formatStateUsing(fn(SocialInsuranceStatus $state): string => $state->getLabel())
+                    ->badge()
+                    ->color(fn(SocialInsuranceStatus $state): string => match($state) {
+                        SocialInsuranceStatus::NOT_APPLICABLE => 'gray',
+                        SocialInsuranceStatus::PENDING => 'warning',
+                        SocialInsuranceStatus::DONE => 'success',
+                    })
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('social_insurance_number')
+                    ->label('Insurance Number')
+                    ->placeholder('Not Provided')
+                    ->copyable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('manager.name')
                     ->label('Reports To')
                     ->placeholder('No Manager')
@@ -141,6 +158,12 @@ class ListEmployees extends ListRecords
                 Tables\Filters\SelectFilter::make('level')
                     ->label('Level')
                     ->options(EmployeeLevel::options())
+                    ->searchable()
+                    ->native(false)
+                    ->multiple(),
+                Tables\Filters\SelectFilter::make('social_insurance_status')
+                    ->label('Social Insurance Status')
+                    ->options(SocialInsuranceStatus::options())
                     ->searchable()
                     ->native(false)
                     ->multiple(),

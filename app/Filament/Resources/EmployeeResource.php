@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Enum\EmployeeLevel;
 use App\Enum\MaritalStatus;
 use App\Enum\ContractType;
+use App\Enum\SocialInsuranceStatus;
 use App\Filament\Resources\EmployeeResource\Pages;
 use App\Models\Employee;
 use App\Models\Position;
@@ -214,6 +215,20 @@ class EmployeeResource extends Resource
                                     ->default(ContractType::PERMANENT->value)
                                     ->required()
                                     ->helperText('Select the employment contract type'),
+                                Forms\Components\Select::make('social_insurance_status')
+                                    ->label('Social Insurance Status')
+                                    ->placeholder('Select Social Insurance Status')
+                                    ->options(SocialInsuranceStatus::options())
+                                    ->default(SocialInsuranceStatus::NOT_APPLICABLE->value)
+                                    ->required()
+                                    ->live()
+                                    ->helperText('Select the current social insurance status'),
+                                Forms\Components\TextInput::make('social_insurance_number')
+                                    ->label('Social Insurance Number')
+                                    ->placeholder('Enter social insurance number')
+                                    ->maxLength(255)
+                                    ->visible(fn(Forms\Get $get) => in_array($get('social_insurance_status'), ['pending', 'done']))
+                                    ->helperText('Enter the social insurance policy number'),
                                 Forms\Components\Select::make('reporting_to')
                                     ->label('Reports To (Manager)')
                                     ->placeholder('Select Direct Manager')

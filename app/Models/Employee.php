@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Enum\EmployeeLevel;
 use App\Enum\MaritalStatus;
 use App\Enum\ContractType;
+use App\Enum\SocialInsuranceStatus;
 use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -40,6 +41,8 @@ class Employee extends Authenticatable implements HasMedia
         'position_id',
         'level',
         'contract_type',
+        'social_insurance_status',
+        'social_insurance_number',
         'reporting_to',
         'company_date_of_joining',
         'status',
@@ -57,6 +60,7 @@ class Employee extends Authenticatable implements HasMedia
         'level' => EmployeeLevel::class,
         'marital_status' => MaritalStatus::class,
         'contract_type' => ContractType::class,
+        'social_insurance_status' => SocialInsuranceStatus::class,
         'status' => 'boolean',
         'password_set_at' => 'datetime',
         'email_verified_at' => 'datetime',

@@ -6,6 +6,7 @@ use App\Filament\Resources\EmployeeResource;
 use App\Http\Resources\MediaResource;
 use App\Enum\MaritalStatus;
 use App\Enum\ContractType;
+use App\Enum\SocialInsuranceStatus;
 use Filament\Actions\EditAction;
 use Filament\Infolists\Components;
 use Filament\Infolists\Infolist;
@@ -147,6 +148,21 @@ class ViewEmployee extends ViewRecord
                                         ContractType::INTERNSHIP => 'orange',
                                     })
                                     ->formatStateUsing(fn(ContractType $state): string => $state->label()),
+                                Components\TextEntry::make('social_insurance_status')
+                                    ->label('Social Insurance Status')
+                                    ->badge()
+                                    ->color(fn(SocialInsuranceStatus $state): string => match($state) {
+                                        SocialInsuranceStatus::NOT_APPLICABLE => 'gray',
+                                        SocialInsuranceStatus::PENDING => 'warning',
+                                        SocialInsuranceStatus::DONE => 'success',
+                                    })
+                                    ->formatStateUsing(fn(SocialInsuranceStatus $state): string => $state->getLabel()),
+                                Components\TextEntry::make('social_insurance_number')
+                                    ->label('Social Insurance Number')
+                                    ->placeholder('Not Provided')
+                                    ->visible(fn($record): bool => in_array($record->social_insurance_status->value, ['pending', 'done']))
+                                    ->badge()
+                                    ->color('primary'),
                                 Components\TextEntry::make('manager.name')
                                     ->label('Reports To (Manager)')
                                     ->placeholder('No Manager Assigned')
