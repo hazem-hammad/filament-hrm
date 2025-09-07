@@ -6,6 +6,7 @@ use App\Enum\EmployeeLevel;
 use App\Enum\MaritalStatus;
 use App\Enum\ContractType;
 use App\Enum\SocialInsuranceStatus;
+use Filament\Models\Contracts\HasAvatar;
 use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -17,7 +18,7 @@ use Laravel\Sanctum\HasApiTokens;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 
-class Employee extends Authenticatable implements HasMedia
+class Employee extends Authenticatable implements HasMedia, HasAvatar
 {
     use HasApiTokens, InteractsWithMedia, Notifiable;
 
