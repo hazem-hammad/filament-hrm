@@ -26,7 +26,7 @@ class JiraTasks extends Page
     protected static ?int $navigationSort = 2;
 
     // should register navigation
-    protected static bool $shouldRegisterNavigation = true;
+    protected static bool $shouldRegisterNavigation = false;
 
     public Collection $tasks;
     public array $filters = [];
