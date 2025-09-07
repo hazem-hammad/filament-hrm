@@ -113,4 +113,86 @@ class AttendanceType extends Model
 
         return empty($limits) ? 'Limited (no specific limits set)' : implode(', ', $limits);
     }
+
+    // Monthly validation for employee requests
+    public function canEmployeeRequestThisMonth($employeeId, $requestedHours = 0, $excludeRequestId = null): array
+    {
+        $currentMonth = now()->month;
+        $currentYear = now()->year;
+        
+        // Get current month's approved usage for this employee and attendance type
+        // Use request_date instead of created_at for proper monthly calculations
+        $monthlyUsageQuery = \App\Models\Request::where('employee_id', $employeeId)
+            ->where('request_type', 'attendance')
+            ->where('requestable_type', self::class)
+            ->where('requestable_id', $this->id)
+            ->where('status', 'approved')
+            ->whereYear('request_date', $currentYear)
+            ->whereMonth('request_date', $currentMonth);
+
+        // Exclude current request when editing
+        if ($excludeRequestId) {
+            $monthlyUsageQuery->where('id', '!=', $excludeRequestId);
+        }
+
+        $usedRequests = $monthlyUsageQuery->count();
+        $usedHours = $monthlyUsageQuery->sum('hours') ?? 0;
+
+        if (!$this->has_limit) {
+            return [
+                'can_request' => true,
+                'message' => 'No limits applied for this attendance type.',
+                'used_requests' => $usedRequests,
+                'used_hours' => $usedHours,
+                'remaining_requests' => null,
+                'remaining_hours' => null
+            ];
+        }
+
+        // Check request limit
+        if ($this->max_requests_per_month && $usedRequests >= $this->max_requests_per_month) {
+            return [
+                'can_request' => false,
+                'message' => "Monthly request limit reached ({$usedRequests}/{$this->max_requests_per_month})",
+                'used_requests' => $usedRequests,
+                'used_hours' => $usedHours,
+                'remaining_requests' => 0,
+                'remaining_hours' => $this->max_hours_per_month ? ($this->max_hours_per_month - $usedHours) : null
+            ];
+        }
+
+        // Check hours limit
+        if ($this->max_hours_per_month && ($usedHours + $requestedHours) > $this->max_hours_per_month) {
+            $remaining = max(0, $this->max_hours_per_month - $usedHours);
+            return [
+                'can_request' => false,
+                'message' => "Monthly hours limit would be exceeded. Used: {$usedHours}/{$this->max_hours_per_month} hours. Remaining: {$remaining} hours.",
+                'used_requests' => $usedRequests,
+                'used_hours' => $usedHours,
+                'remaining_requests' => $this->max_requests_per_month ? ($this->max_requests_per_month - $usedRequests) : null,
+                'remaining_hours' => $remaining
+            ];
+        }
+
+        // Check per-request hours limit
+        if ($this->max_hours_per_request && $requestedHours > $this->max_hours_per_request) {
+            return [
+                'can_request' => false,
+                'message' => "Requested hours ({$requestedHours}) exceed maximum per request ({$this->max_hours_per_request})",
+                'used_requests' => $usedRequests,
+                'used_hours' => $usedHours,
+                'remaining_requests' => $this->max_requests_per_month ? ($this->max_requests_per_month - $usedRequests) : null,
+                'remaining_hours' => $this->max_hours_per_month ? ($this->max_hours_per_month - $usedHours) : null
+            ];
+        }
+
+        return [
+            'can_request' => true,
+            'message' => 'Request can be submitted.',
+            'used_requests' => $usedRequests,
+            'used_hours' => $usedHours,
+            'remaining_requests' => $this->max_requests_per_month ? ($this->max_requests_per_month - $usedRequests) : null,
+            'remaining_hours' => $this->max_hours_per_month ? ($this->max_hours_per_month - $usedHours) : null
+        ];
+    }
 }

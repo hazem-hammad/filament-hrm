@@ -79,6 +79,21 @@ class Request extends Model implements HasMedia
         return $this->morphTo();
     }
 
+    // Helper method to get approver name
+    public function getApproverNameAttribute(): ?string
+    {
+        if ($this->approved_by) {
+            return $this->approver?->name;
+        }
+        
+        // If approved_by is null but status is approved/rejected, it was done by admin
+        if (in_array($this->status, ['approved', 'rejected']) && $this->approved_at) {
+            return 'System Admin';
+        }
+        
+        return null;
+    }
+
     // Scopes
     #[Scope]
     public function pending(Builder $query): void

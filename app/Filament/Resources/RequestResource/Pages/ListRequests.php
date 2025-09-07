@@ -107,7 +107,7 @@ class ListRequests extends ListRecords
                         ->action(function (Request $record) {
                             $record->update([
                                 'status' => 'approved',
-                                'approved_by' => auth()->id(),
+                                'approved_by' => null, // Set to null when approved by admin
                                 'approved_at' => now(),
                             ]);
                         })
@@ -126,7 +126,7 @@ class ListRequests extends ListRecords
                             $record->update([
                                 'status' => 'rejected',
                                 'admin_notes' => $data['admin_notes'],
-                                'approved_by' => auth()->id(),
+                                'approved_by' => null, // Set to null when rejected by admin
                                 'approved_at' => now(),
                             ]);
                         })

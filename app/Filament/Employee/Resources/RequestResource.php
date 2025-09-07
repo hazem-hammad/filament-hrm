@@ -12,7 +12,9 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Forms\Get;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Auth;
 
 class RequestResource extends Resource
 {
@@ -145,69 +147,80 @@ class RequestResource extends Resource
 
                                 if ($get('request_type') === 'attendance') {
                                     $attendanceType = AttendanceType::find($get('requestable_id'));
-                                    if (!$attendanceType) return '❌ Attendance type not found';
+                                    if (!$attendanceType) return new HtmlString('❌ Attendance type not found');
+
+                                    // Use the new monthly validation method
+                                    $requestedHours = (float)($get('hours') ?? 0);
+                                    $validation = $attendanceType->canEmployeeRequestThisMonth($employee->id, $requestedHours);
 
                                     if (!$attendanceType->has_limit) {
-                                        return "
+                                        return new HtmlString("
                                         <div class='bg-green-50 border border-green-200 rounded-lg p-4'>
                                             <div class='flex items-center gap-2'>
                                                 <span class='text-2xl'>♾️</span>
                                                 <h3 class='font-semibold text-green-800'>No Monthly Limits</h3>
                                             </div>
                                             <p class='text-sm text-green-600 mt-1'>This attendance type has no restrictions</p>
+                                            <div class='text-xs text-gray-600 mt-2'>
+                                                Current month usage: {$validation['used_requests']} requests, {$validation['used_hours']} hours
+                                            </div>
                                         </div>
-                                        ";
+                                        ");
                                     }
 
-                                    // Calculate monthly usage
-                                    $currentMonth = now()->format('Y-m');
-                                    $monthlyUsage = Request::where('employee_id', $employee->id)
-                                        ->where('requestable_type', AttendanceType::class)
-                                        ->where('requestable_id', $attendanceType->id)
-                                        ->where('status', 'approved')
-                                        ->where('request_date', 'like', "{$currentMonth}%")
-                                        ->selectRaw('SUM(hours) as total_hours, COUNT(*) as total_requests')
-                                        ->first();
+                                    // Determine status color based on validation
+                                    $statusColor = $validation['can_request'] ? 'orange' : 'red';
+                                    $statusIcon = $validation['can_request'] ? '⏰' : '⚠️';
 
-                                    $usedHours = $monthlyUsage->total_hours ?? 0;
-                                    $usedRequests = $monthlyUsage->total_requests ?? 0;
-
-                                    $content = "<div class='bg-orange-50 border border-orange-200 rounded-lg p-4'>";
-                                    $content .= "<div class='flex items-center gap-2 mb-3'><span class='text-2xl'>⏰</span><h3 class='font-semibold text-orange-800'>Monthly Usage</h3></div>";
+                                    $content = "<div class='bg-{$statusColor}-50 border border-{$statusColor}-200 rounded-lg p-4'>";
+                                    $content .= "<div class='flex items-center gap-2 mb-3'><span class='text-2xl'>{$statusIcon}</span><h3 class='font-semibold text-{$statusColor}-800'>Monthly Usage - " . now()->format('F Y') . "</h3></div>";
+                                    
+                                    if (!$validation['can_request']) {
+                                        $content .= "<div class='mb-3 p-2 bg-red-100 border border-red-300 rounded text-red-700 text-sm'>";
+                                        $content .= "❌ {$validation['message']}";
+                                        $content .= "</div>";
+                                    }
+                                    
                                     $content .= "<div class='space-y-3'>";
 
                                     if ($attendanceType->max_hours_per_month) {
-                                        $remainingHours = max(0, $attendanceType->max_hours_per_month - $usedHours);
-                                        $hourPercentage = round(($usedHours / $attendanceType->max_hours_per_month) * 100);
+                                        $usedHours = $validation['used_hours'];
+                                        $remainingHours = $validation['remaining_hours'] ?? 0;
+                                        $hourPercentage = $attendanceType->max_hours_per_month > 0 ? round(($usedHours / $attendanceType->max_hours_per_month) * 100) : 0;
+                                        $barColor = $validation['can_request'] ? 'orange' : 'red';
                                         $content .= "
                                         <div>
                                             <div class='flex justify-between text-sm mb-1'>
                                                 <span>Hours Used:</span>
-                                                <span class='font-bold text-orange-600'>{$usedHours} / {$attendanceType->max_hours_per_month}h</span>
+                                                <span class='font-bold text-{$barColor}-600'>{$usedHours} / {$attendanceType->max_hours_per_month}h</span>
                                             </div>
-                                            <div class='w-full bg-orange-200 rounded-full h-2'>
-                                                <div class='bg-orange-600 h-2 rounded-full' style='width: {$hourPercentage}%'></div>
+                                            <div class='w-full bg-{$barColor}-200 rounded-full h-2'>
+                                                <div class='bg-{$barColor}-600 h-2 rounded-full' style='width: {$hourPercentage}%'></div>
                                             </div>
+                                            <div class='text-xs text-{$barColor}-600 mt-1'>Remaining: {$remainingHours}h</div>
                                         </div>";
                                     }
 
                                     if ($attendanceType->max_requests_per_month) {
-                                        $remainingRequests = max(0, $attendanceType->max_requests_per_month - $usedRequests);
-                                        $requestPercentage = round(($usedRequests / $attendanceType->max_requests_per_month) * 100);
+                                        $usedRequests = $validation['used_requests'];
+                                        $remainingRequests = $validation['remaining_requests'] ?? 0;
+                                        $requestPercentage = $attendanceType->max_requests_per_month > 0 ? round(($usedRequests / $attendanceType->max_requests_per_month) * 100) : 0;
+                                        $barColor = $validation['can_request'] ? 'orange' : 'red';
                                         $content .= "
                                         <div>
                                             <div class='flex justify-between text-sm mb-1'>
                                                 <span>Requests Used:</span>
-                                                <span class='font-bold text-orange-600'>{$usedRequests} / {$attendanceType->max_requests_per_month}</span>
+                                                <span class='font-bold text-{$barColor}-600'>{$usedRequests} / {$attendanceType->max_requests_per_month}</span>
                                             </div>
-                                            <div class='w-full bg-orange-200 rounded-full h-2'>
-                                                <div class='bg-orange-600 h-2 rounded-full' style='width: {$requestPercentage}%'></div>
+                                            <div class='w-full bg-{$barColor}-200 rounded-full h-2'>
+                                                <div class='bg-{$barColor}-600 h-2 rounded-full' style='width: {$requestPercentage}%'></div>
                                             </div>
+                                            <div class='text-xs text-{$barColor}-600 mt-1'>Remaining: {$remainingRequests}</div>
                                         </div>";
                                     }
 
                                     $content .= "</div></div>";
-                                    return $content;
+                                    return new HtmlString($content);
                                 }
 
                                 return '';
@@ -316,6 +329,27 @@ class RequestResource extends Resource
                                     ->disabled()
                                     ->placeholder('Auto calculated')
                                     ->prefix('⏱️')
+                                    ->rules([
+                                        function (Get $get) {
+                                            return function (string $attribute, $value, \Closure $fail) use ($get) {
+                                                if ($get('request_type') !== 'attendance' || !$get('requestable_id') || !$value) {
+                                                    return;
+                                                }
+                                                
+                                                $attendanceType = AttendanceType::find($get('requestable_id'));
+                                                if (!$attendanceType) {
+                                                    return;
+                                                }
+
+                                                $employee = Auth::guard('employee')->user();
+                                                $validation = $attendanceType->canEmployeeRequestThisMonth($employee->id, (float)$value);
+                                                
+                                                if (!$validation['can_request']) {
+                                                    $fail($validation['message']);
+                                                }
+                                            };
+                                        },
+                                    ])
                                     ->helperText('Automatically calculated'),
                             ]),
                     ])

@@ -118,30 +118,20 @@ class RequestResource extends Resource
                                                 return '♾️ Unlimited';
                                             }
 
-                                            // Calculate monthly usage
-                                            $currentMonth = now()->format('Y-m');
-                                            $monthlyUsage = Request::where('employee_id', $employee->id)
-                                                ->where('requestable_type', AttendanceType::class)
-                                                ->where('requestable_id', $attendanceType->id)
-                                                ->where('status', 'approved')
-                                                ->where('request_date', 'like', $currentMonth . '%')
-                                                ->selectRaw('SUM(hours) as total_hours, COUNT(*) as total_requests')
-                                                ->first();
-
-                                            $usedHours = $monthlyUsage->total_hours ?? 0;
-                                            $usedRequests = $monthlyUsage->total_requests ?? 0;
+                                            // Use the new monthly validation method
+                                            $validation = $attendanceType->canEmployeeRequestThisMonth($employee->id, 0);
 
                                             $info = [];
-                                            if ($attendanceType->max_hours_per_month) {
-                                                $remainingHours = max(0, $attendanceType->max_hours_per_month - $usedHours);
-                                                $info[] = "⏰ {$remainingHours}h remaining this month";
+                                            if ($attendanceType->max_hours_per_month && $validation['remaining_hours'] !== null) {
+                                                $info[] = "⏰ {$validation['remaining_hours']}h remaining this month";
                                             }
-                                            if ($attendanceType->max_requests_per_month) {
-                                                $remainingRequests = max(0, $attendanceType->max_requests_per_month - $usedRequests);
-                                                $info[] = "📝 {$remainingRequests} requests remaining this month";
+                                            if ($attendanceType->max_requests_per_month && $validation['remaining_requests'] !== null) {
+                                                $info[] = "📝 {$validation['remaining_requests']} requests remaining this month";
                                             }
 
-                                            return empty($info) ? '♾️ No monthly limits' : implode(' • ', $info);
+                                            $usageInfo = "Used: {$validation['used_requests']} requests, {$validation['used_hours']} hours";
+                                            
+                                            return empty($info) ? "♾️ No monthly limits • {$usageInfo}" : implode(' • ', $info) . " • {$usageInfo}";
                                         }
                                     })
                                     ->visible(fn(Forms\Get $get) => filled($get('requestable_id')))
@@ -279,38 +269,11 @@ class RequestResource extends Resource
 
                                                 if (!$attendanceType || !$employee) return;
 
-                                                if ($attendanceType->has_limit) {
-                                                    $currentMonth = now()->format('Y-m');
-                                                    $monthlyUsage = Request::where('employee_id', $employee->id)
-                                                        ->where('requestable_type', AttendanceType::class)
-                                                        ->where('requestable_id', $attendanceType->id)
-                                                        ->where('status', 'approved')
-                                                        ->where('request_date', 'like', $currentMonth . '%')
-                                                        ->selectRaw('SUM(hours) as total_hours, COUNT(*) as total_requests')
-                                                        ->first();
-
-                                                    $usedHours = $monthlyUsage->total_hours ?? 0;
-                                                    $usedRequests = $monthlyUsage->total_requests ?? 0;
-
-                                                    if ($attendanceType->max_hours_per_request && $value > $attendanceType->max_hours_per_request) {
-                                                        $fail("Request exceeds maximum hours per request ({$attendanceType->max_hours_per_request} hours).");
-                                                    }
-
-                                                    if ($attendanceType->max_hours_per_month) {
-                                                        $totalHoursAfterRequest = $usedHours + $value;
-                                                        if ($totalHoursAfterRequest > $attendanceType->max_hours_per_month) {
-                                                            $remaining = $attendanceType->max_hours_per_month - $usedHours;
-                                                            $fail("Monthly hour limit exceeded. You have {$remaining} hours remaining this month.");
-                                                        }
-                                                    }
-
-                                                    if ($attendanceType->max_requests_per_month) {
-                                                        $totalRequestsAfterRequest = $usedRequests + 1;
-                                                        if ($totalRequestsAfterRequest > $attendanceType->max_requests_per_month) {
-                                                            $remaining = $attendanceType->max_requests_per_month - $usedRequests;
-                                                            $fail("Monthly request limit exceeded. You have {$remaining} requests remaining this month.");
-                                                        }
-                                                    }
+                                                // Use the new monthly validation method
+                                                $validation = $attendanceType->canEmployeeRequestThisMonth($employee->id, (float)$value);
+                                                
+                                                if (!$validation['can_request']) {
+                                                    $fail($validation['message']);
                                                 }
                                             };
                                         }
