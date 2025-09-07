@@ -137,8 +137,6 @@ class ListAttendances extends ListRecords
 
     protected function getHeaderWidgets(): array
     {
-        return [
-            \App\Filament\Employee\Widgets\AttendanceStatsWidget::class,
-        ];
+        return [];
     }
 }

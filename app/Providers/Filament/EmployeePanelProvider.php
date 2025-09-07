@@ -5,6 +5,7 @@ namespace App\Providers\Filament;
 use App\Enum\FilamentPanelID;
 use Filament\FontProviders\GoogleFontProvider;
 use Filament\Http\Middleware\Authenticate;
+use Filament\Navigation\NavigationGroup;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
@@ -68,6 +69,11 @@ class EmployeePanelProvider extends PanelProvider
             ->plugins([
                 SpatieLaravelTranslatablePlugin::make()
                     ->defaultLocales(['en', 'ar']),
+            ])
+            ->navigationGroups([
+                NavigationGroup::make('Documents')
+                    ->icon('heroicon-o-folder')
+                    ->collapsed(false),
             ])
             ->authGuard('employee')
             ->authMiddleware([

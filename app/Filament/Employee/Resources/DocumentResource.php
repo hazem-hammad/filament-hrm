@@ -14,11 +14,13 @@ class DocumentResource extends Resource
 {
     protected static ?string $model = Document::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-user';
+    protected static ?string $navigationIcon = null;
 
     protected static ?string $navigationLabel = 'My Files';
+    
+    protected static ?string $navigationGroup = 'Documents';
 
-    protected static ?int $navigationSort = 3;
+    protected static ?int $navigationSort = 1;
 
     public static function table(Table $table): Table
     {

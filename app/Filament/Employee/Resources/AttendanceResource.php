@@ -14,11 +14,11 @@ class AttendanceResource extends Resource
     protected static ?string $model = Attendance::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-clock';
-    
-    protected static ?string $navigationLabel = 'My Attendance';
-    
+
+    protected static ?string $navigationLabel = 'Attendance';
+
     protected static ?string $modelLabel = 'Attendance';
-    
+
     protected static ?string $pluralModelLabel = 'Attendance Records';
 
     // Employees cannot create/edit attendance records
@@ -45,7 +45,7 @@ class AttendanceResource extends Resource
             'index' => Pages\ListAttendances::route('/'),
         ];
     }
-    
+
     // Filter to show only current employee's attendance
     public static function getEloquentQuery(): Builder
     {
@@ -53,18 +53,18 @@ class AttendanceResource extends Resource
             ->where('employee_id', auth()->id())
             ->with(['workPlan']);
     }
-    
+
     // Disable create and edit for employees
     public static function canCreate(): bool
     {
         return false;
     }
-    
+
     public static function canEdit($record): bool
     {
         return false;
     }
-    
+
     public static function canDelete($record): bool
     {
         return false;
