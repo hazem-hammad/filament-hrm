@@ -138,7 +138,7 @@ class EmployeeImport implements
             'business_phone' => trim(strval($row['business_phone'] ?? '')),
             'gender' => strtolower(trim($row['gender'] ?? '')),
             'marital_status' => strtolower(trim($row['marital_status'] ?? 'single')),
-            'national_id' => trim($row['national_id'] ?? ''),
+            'national_id' => $this->parseNationalId($row['national_id'] ?? ''),
             'date_of_birth' => $this->parseDate($row['date_of_birth'] ?? ''),
             'address' => trim($row['address'] ?? ''),
             'emergency_contact_name' => trim($row['emergency_contact_name'] ?? ''),
@@ -156,33 +156,113 @@ class EmployeeImport implements
         ];
     }
 
-    protected function parseDate(?string $dateString): ?string
+    protected function parseNationalId($nationalId): string
+    {
+        if (empty($nationalId)) {
+            return '';
+        }
+
+        // Convert to string first
+        $nationalId = strval($nationalId);
+        
+        // Handle scientific notation (e.g., 2.94103E+13)
+        if (stripos($nationalId, 'E+') !== false || stripos($nationalId, 'e+') !== false) {
+            // Convert scientific notation to regular number
+            $nationalId = sprintf('%.0f', floatval($nationalId));
+        }
+        
+        // Remove any non-numeric characters except leading zeros
+        $nationalId = preg_replace('/[^0-9]/', '', $nationalId);
+        
+        return trim($nationalId);
+    }
+
+    protected function parseDate($dateString): ?string
     {
         if (empty($dateString)) {
             return null;
         }
 
+        // Convert to string in case it's a number
+        $dateString = strval($dateString);
+        $originalString = trim($dateString);
+        
         try {
-            // Try different date formats
-            $formats = [
-                'Y-m-d',
-                'd/m/Y',
-                'm/d/Y',
-                'd-m-Y',
-                'm-d-Y',
-                'Y/m/d',
+            // Handle specific month abbreviation formats first (most reliable)
+            $monthFormats = [
+                'M j, Y',          // Apr 10, 1996
+                'F j, Y',          // April 10, 1996  
+                'd-M-Y',           // 10-Apr-1996
+                'd M Y',           // 10 Apr 1996
+                'M d, Y',          // Apr 10, 1996 (alternative)
+            ];
+            
+            foreach ($monthFormats as $format) {
+                $date = \DateTime::createFromFormat($format, $originalString);
+                if ($date !== false && $date->format($format) === $originalString) {
+                    return $date->format('Y-m-d');
+                }
+            }
+            
+            // Handle standard formats with more specific logic
+            // Check if it looks like MM/DD/YYYY (US format) vs DD/MM/YYYY
+            if (preg_match('/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/', $originalString, $matches)) {
+                $part1 = (int)$matches[1];
+                $part2 = (int)$matches[2]; 
+                $year = (int)$matches[3];
+                
+                // If first part > 12, it must be day, so DD/MM/YYYY
+                if ($part1 > 12) {
+                    $date = \DateTime::createFromFormat('d/m/Y', $originalString);
+                    if ($date !== false) {
+                        return $date->format('Y-m-d');
+                    }
+                }
+                // If second part > 12, it must be day, so MM/DD/YYYY  
+                elseif ($part2 > 12) {
+                    $date = \DateTime::createFromFormat('m/d/Y', $originalString);
+                    if ($date !== false) {
+                        return $date->format('Y-m-d');
+                    }
+                }
+                // Ambiguous case - try MM/DD/YYYY first (more common in CSV exports)
+                else {
+                    $date = \DateTime::createFromFormat('m/d/Y', $originalString);
+                    if ($date !== false) {
+                        return $date->format('Y-m-d');
+                    }
+                    // Fallback to DD/MM/YYYY
+                    $date = \DateTime::createFromFormat('d/m/Y', $originalString);
+                    if ($date !== false) {
+                        return $date->format('Y-m-d');
+                    }
+                }
+            }
+            
+            // Try other common formats
+            $otherFormats = [
+                'Y-m-d',           // 2024-01-15
+                'd-m-Y',           // 15-01-2024
+                'm-d-Y',           // 01-15-2024
+                'Y/m/d',           // 2024/01/15
             ];
 
-            foreach ($formats as $format) {
-                $date = \DateTime::createFromFormat($format, $dateString);
+            foreach ($otherFormats as $format) {
+                $date = \DateTime::createFromFormat($format, $originalString);
                 if ($date !== false) {
                     return $date->format('Y-m-d');
                 }
             }
 
-            // Try to parse with Carbon
-            return \Carbon\Carbon::parse($dateString)->format('Y-m-d');
+            // Last resort: try Carbon parsing
+            $parsedDate = \Carbon\Carbon::parse($originalString);
+            return $parsedDate->format('Y-m-d');
         } catch (\Exception $e) {
+            // Log the problematic date for debugging
+            Log::warning('Failed to parse date during import', [
+                'date_string' => $originalString,
+                'error' => $e->getMessage()
+            ]);
             return null;
         }
     }
