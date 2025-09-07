@@ -45,6 +45,7 @@ class EmployeePanelProvider extends PanelProvider
             ->pages([
                 \App\Filament\Employee\Pages\Dashboard::class,
                 \App\Filament\Employee\Pages\MyProfile::class,
+                \App\Filament\Employee\Pages\JiraTasks::class,
             ])
             ->discoverWidgets(in: app_path('Filament/Employee/Widgets'), for: 'App\\Filament\\Employee\\Widgets')
             ->widgets([

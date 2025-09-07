@@ -354,18 +354,38 @@ class ListEmployees extends ListRecords
                                                 <strong>💡 Tip:</strong> Download the template below for proper formatting and sample data.
                                             </p>
                                         </div>
+                                        <div class="bg-amber-50 p-3 rounded-lg border border-amber-200">
+                                            <p class="text-sm text-amber-800">
+                                                <strong>⚠️ Required Fields:</strong> name, email, phone, gender, marital_status, national_id, department, position, contract_type, <strong>social_insurance_status</strong>
+                                            </p>
+                                        </div>
+                                        <div class="bg-green-50 p-3 rounded-lg border border-green-200">
+                                            <p class="text-sm text-green-800">
+                                                <strong>✅ Valid Social Insurance Status Values:</strong> not_applicable, pending, done
+                                            </p>
+                                        </div>
                                     </div>
                                 '))
                                 ->columnSpanFull(),
                             \Filament\Forms\Components\Actions::make([
-                                \Filament\Forms\Components\Actions\Action::make('download_template')
-                                    ->label('Download Template')
+                                \Filament\Forms\Components\Actions\Action::make('download_excel_template')
+                                    ->label('Download Excel Template')
                                     ->icon('heroicon-o-arrow-down-tray')
                                     ->color('success')
                                     ->action(function () {
                                         return response()->download(
                                             public_path('samples/imports/employee_import_template.xlsx'),
                                             'employee_import_template.xlsx'
+                                        );
+                                    }),
+                                \Filament\Forms\Components\Actions\Action::make('download_csv_template')
+                                    ->label('Download CSV Template')
+                                    ->icon('heroicon-o-document-text')
+                                    ->color('info')
+                                    ->action(function () {
+                                        return response()->download(
+                                            public_path('samples/imports/employee_import_template_simple.csv'),
+                                            'employee_import_template.csv'
                                         );
                                     })
                             ])->columnSpanFull(),

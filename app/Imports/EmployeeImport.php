@@ -103,7 +103,7 @@ class EmployeeImport implements
             'employee_id' => $cleanedRow['employee_id'],
             'department_id' => $department->id,
             'position_id' => $position->id,
-            'level' => $cleanedRow['employee_level'] ?? 'junior',
+            'level' => $cleanedRow['employee_level'] ?? 'entry',
             'contract_type' => $cleanedRow['contract_type'],
             'social_insurance_status' => $cleanedRow['social_insurance_status'],
             'social_insurance_number' => $cleanedRow['social_insurance_number'],
@@ -147,7 +147,7 @@ class EmployeeImport implements
             'employee_id' => trim($row['employee_id'] ?? ''),
             'department' => trim($row['department'] ?? ''),
             'position' => trim($row['position'] ?? ''),
-            'employee_level' => strtolower(trim($row['employee_level'] ?? 'junior')),
+            'employee_level' => strtolower(trim($row['employee_level'] ?? 'entry')),
             'contract_type' => strtolower(trim($row['contract_type'] ?? 'permanent')),
             'social_insurance_status' => strtolower(trim($row['social_insurance_status'] ?? 'not_applicable')),
             'social_insurance_number' => trim($row['social_insurance_number'] ?? ''),
@@ -189,7 +189,7 @@ class EmployeeImport implements
 
     protected function validateRequiredFields(array $row, int $rowNumber): void
     {
-        $requiredFields = ['name', 'email', 'phone', 'gender', 'marital_status', 'national_id', 'department', 'position', 'contract_type'];
+        $requiredFields = ['name', 'email', 'phone', 'gender', 'marital_status', 'national_id', 'department', 'position', 'contract_type', 'social_insurance_status'];
 
         foreach ($requiredFields as $field) {
             if (empty($row[$field])) {
@@ -226,7 +226,7 @@ class EmployeeImport implements
         }
 
         // Validate employee level
-        $validLevels = ['intern', 'junior', 'mid', 'senior', 'lead', 'manager', 'director'];
+        $validLevels = ['internship', 'entry', 'junior', 'mid', 'senior', 'lead', 'manager'];
         if (!in_array($row['employee_level'], $validLevels)) {
             throw new \Exception("Invalid employee level: {$row['employee_level']}. Must be one of: " . implode(', ', $validLevels));
         }
