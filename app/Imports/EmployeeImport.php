@@ -72,8 +72,8 @@ class EmployeeImport implements
             $cleanedRow['employee_id'] = $this->generateEmployeeId($department);
         }
 
-        // Check if employee already exists
-        if (Employee::where('email', $cleanedRow['email'])->exists()) {
+        // Check if employee already exists (only if email is provided)
+        if (!empty($cleanedRow['email']) && Employee::where('email', $cleanedRow['email'])->exists()) {
             throw new \Exception("Employee with email {$cleanedRow['email']} already exists");
         }
 
@@ -88,14 +88,14 @@ class EmployeeImport implements
         // Create employee
         $employee = Employee::create([
             'name' => $cleanedRow['name'],
-            'email' => $cleanedRow['email'],
+            'email' => $cleanedRow['email'] ?: null,
             'personal_email' => $cleanedRow['personal_email'] ?: null,
             'phone' => $cleanedRow['phone'],
             'business_phone' => $cleanedRow['business_phone'] ?: null,
             'gender' => $cleanedRow['gender'],
             'marital_status' => $cleanedRow['marital_status'],
             'national_id' => $cleanedRow['national_id'],
-            'date_of_birth' => $cleanedRow['date_of_birth'],
+            'date_of_birth' => $cleanedRow['date_of_birth'] ?: null,
             'address' => $cleanedRow['address'],
             'emergency_contact_name' => $cleanedRow['emergency_contact_name'] ?: null,
             'emergency_contact_relation' => $cleanedRow['emergency_contact_relation'] ?: null,
@@ -110,7 +110,7 @@ class EmployeeImport implements
             'reporting_to' => $manager?->id,
             'company_date_of_joining' => $cleanedRow['company_joining_date'],
             'password' => $hashedPassword,
-            'email_verified_at' => now(),
+            'email_verified_at' => $cleanedRow['email'] ? now() : null,
             'status' => true,
         ]);
 
@@ -269,7 +269,7 @@ class EmployeeImport implements
 
     protected function validateRequiredFields(array $row, int $rowNumber): void
     {
-        $requiredFields = ['name', 'email', 'phone', 'gender', 'marital_status', 'national_id', 'department', 'position', 'contract_type', 'social_insurance_status'];
+        $requiredFields = ['name', 'phone', 'gender', 'marital_status', 'national_id', 'department', 'position', 'contract_type', 'social_insurance_status'];
 
         foreach ($requiredFields as $field) {
             if (empty($row[$field])) {
@@ -277,8 +277,8 @@ class EmployeeImport implements
             }
         }
 
-        // Validate email format
-        if (!filter_var($row['email'], FILTER_VALIDATE_EMAIL)) {
+        // Validate email format only if provided
+        if (!empty($row['email']) && !filter_var($row['email'], FILTER_VALIDATE_EMAIL)) {
             throw new \Exception("Invalid email format: {$row['email']}");
         }
 
@@ -378,15 +378,23 @@ class EmployeeImport implements
                 $employee = $importData['employee'];
                 $password = $importData['password'];
 
-                // Send welcome email with password. Use sendNow to avoid requiring a running queue worker
-                // For the existing notification, we need a password setup token as well
-                $passwordSetupToken = \Illuminate\Support\Str::random(64);
-                Notification::sendNow($employee, new EmployeeWelcomeNotification($password, $passwordSetupToken));
+                // Only send welcome email if employee has email
+                if ($employee->email) {
+                    // Send welcome email with password. Use sendNow to avoid requiring a running queue worker
+                    // For the existing notification, we need a password setup token as well
+                    $passwordSetupToken = \Illuminate\Support\Str::random(64);
+                    Notification::sendNow($employee, new EmployeeWelcomeNotification($password, $passwordSetupToken));
 
-                Log::info('Welcome email sent', [
-                    'employee_id' => $employee->employee_id,
-                    'email' => $employee->email
-                ]);
+                    Log::info('Welcome email sent', [
+                        'employee_id' => $employee->employee_id,
+                        'email' => $employee->email
+                    ]);
+                } else {
+                    Log::info('No email provided, skipping welcome email', [
+                        'employee_id' => $employee->employee_id,
+                        'name' => $employee->name
+                    ]);
+                }
             } catch (\Exception $e) {
                 Log::error('Failed to send welcome email', [
                     'employee_id' => $importData['employee']->employee_id,
@@ -400,13 +408,14 @@ class EmployeeImport implements
     {
         return [
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'email', 'unique:employees,email'],
+            'email' => ['nullable', 'email', 'unique:employees,email'],
             'personal_email' => ['nullable', 'email'],
             'phone' => ['required', 'max:20'], // Remove string validation since Excel converts it to number
             'business_phone' => ['nullable', 'max:20'],
             'gender' => ['required', 'in:male,female'],
             'marital_status' => ['required', 'in:' . implode(',', array_keys(MaritalStatus::options()))],
             'national_id' => ['required', 'max:255'],
+            'date_of_birth' => ['nullable', 'date'],
             'emergency_contact_name' => ['nullable', 'max:255'],
             'emergency_contact_relation' => ['nullable', 'max:255'],
             'emergency_contact_phone' => ['nullable', 'max:20'],

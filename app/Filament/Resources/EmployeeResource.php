@@ -70,7 +70,6 @@ class EmployeeResource extends Resource
                                     ->helperText('Optional business phone number'),
                                 Forms\Components\DatePicker::make('date_of_birth')
                                     ->label('Date of Birth')
-                                    ->required()
                                     ->default(today()),
                                 Forms\Components\Radio::make('gender')
                                     ->label('Gender')
@@ -91,9 +90,8 @@ class EmployeeResource extends Resource
                                     ->label('Work Email')
                                     ->placeholder('Enter employee work email')
                                     ->email()
-                                    ->required()
                                     ->maxLength(255)
-                                    ->helperText('A welcome email with login credentials will be sent after creation'),
+                                    ->helperText('Optional work email. If provided, a welcome email with login credentials will be sent after creation'),
                                 Forms\Components\TextInput::make('personal_email')
                                     ->label('Personal Email')
                                     ->placeholder('Enter employee personal email')
