@@ -7,6 +7,7 @@ use App\Models\Request;
 use App\Models\VacationType;
 use App\Models\AttendanceType;
 use Filament\Resources\Resource;
+use Illuminate\Support\HtmlString;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Forms;
@@ -122,7 +123,7 @@ class RequestResource extends Resource
                                     $remaining = max(0, $vacationType->balance - $usedDays);
                                     $percentage = $vacationType->balance > 0 ? round(($remaining / $vacationType->balance) * 100) : 0;
 
-                                    return "
+                                    return new HtmlString("
                                     <div class='bg-blue-50 border border-blue-200 rounded-lg p-4'>
                                         <div class='flex items-center gap-2 mb-2'>
                                             <span class='text-2xl'>🏖️</span>
@@ -139,7 +140,7 @@ class RequestResource extends Resource
                                             <p class='text-xs text-blue-600'>Used: {$usedDays} days this year</p>
                                         </div>
                                     </div>
-                                    ";
+                                    ");
                                 }
 
                                 if ($get('request_type') === 'attendance') {
@@ -228,6 +229,7 @@ class RequestResource extends Resource
                                     ->label('Start Date')
                                     ->placeholder('Select start date...')
                                     ->required()
+                                    ->live()
                                     ->minDate(now()->addDay())
                                     ->afterStateUpdated(function ($state, $get, $set) {
                                         if ($state && $get('end_date')) {
@@ -245,6 +247,7 @@ class RequestResource extends Resource
                                     ->label('End Date')
                                     ->placeholder('Select end date...')
                                     ->required()
+                                    ->live()
                                     ->minDate(fn($get) => $get('start_date') ?: now()->addDay())
                                     ->afterStateUpdated(function ($state, $get, $set) {
                                         if ($state && $get('start_date')) {
@@ -260,6 +263,7 @@ class RequestResource extends Resource
                                     ->disabled()
                                     ->placeholder('Auto calculated')
                                     ->prefix('📊')
+                                    ->live()
                                     ->helperText('Automatically calculated'),
                             ]),
                     ])

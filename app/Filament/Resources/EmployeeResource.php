@@ -91,7 +91,11 @@ class EmployeeResource extends Resource
                                     ->placeholder('Enter employee work email')
                                     ->email()
                                     ->maxLength(255)
-                                    ->helperText('Optional work email. If provided, a welcome email with login credentials will be sent after creation'),
+                                    ->helperText(fn($livewire) => 
+                                        $livewire instanceof \App\Filament\Resources\EmployeeResource\Pages\CreateEmployee 
+                                        ? 'Optional work email. If provided, a welcome email with login credentials will be sent after creation'
+                                        : null
+                                    ),
                                 Forms\Components\TextInput::make('personal_email')
                                     ->label('Personal Email')
                                     ->placeholder('Enter employee personal email')
