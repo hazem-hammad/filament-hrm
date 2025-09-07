@@ -156,4 +156,9 @@ class Employee extends Authenticatable implements HasMedia
 
         return $prefix . str_pad($newNumber, 3, '0', STR_PAD_LEFT);
     }
+
+    public function getFilamentAvatarUrl(): ?string
+    {
+        return $this->getFirstMediaUrl('profile') ?: null;
+    }
 }
