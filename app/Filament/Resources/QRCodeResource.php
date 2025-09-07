@@ -15,25 +15,29 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Filament\Support\Enums\FontWeight;
 use Filament\Tables\Columns\ImageColumn;
+use Filament\Forms\Components\FileUpload;
 
 class QRCodeResource extends Resource
 {
     protected static ?string $model = QRCode::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-qr-code';
-    
+
     protected static ?string $navigationGroup = 'Tools';
-    
+
     protected static ?string $label = 'QR Code';
-    
+
     protected static ?string $pluralLabel = 'QR Codes';
 
     public static function form(Form $form): Form
     {
+        $qrService = app(QRCodeService::class);
+
         return $form
             ->schema([
                 Forms\Components\Section::make('Contact Information')
                     ->description('Enter the contact details that will be encoded in the QR code.')
+                    ->icon('heroicon-o-identification')
                     ->schema([
                         Forms\Components\TextInput::make('name')
                             ->label('Full Name')
@@ -64,25 +68,77 @@ class QRCodeResource extends Resource
                             ->maxLength(255)
                             ->columnSpanFull(),
                     ])->columns(2),
-                
-                Forms\Components\Section::make('QR Code Settings')
-                    ->description('QR code generation and display settings.')
+
+                Forms\Components\Section::make('Design Customization')
+                    ->description('Customize the appearance and style of your QR code.')
+                    ->icon('heroicon-o-paint-brush')
                     ->schema([
-                        Forms\Components\Toggle::make('is_active')
-                            ->label('Active')
-                            ->default(true)
-                            ->helperText('When disabled, the QR code will not be publicly accessible.'),
-                        Forms\Components\Placeholder::make('qr_preview')
+                        Forms\Components\Grid::make(2)->schema([
+                            Forms\Components\TextInput::make('size')
+                                ->label('Size (pixels)')
+                                ->numeric()
+                                ->default(300)
+                                ->minValue(100)
+                                ->maxValue(1000)
+                                ->suffix('px')
+                                ->helperText('Recommended: 300-500px'),
+
+                            Forms\Components\TextInput::make('margin')
+                                ->label('Margin')
+                                ->numeric()
+                                ->default(1)
+                                ->minValue(0)
+                                ->maxValue(10)
+                                ->helperText('Border spacing around QR code'),
+                        ]),
+                    ]),
+
+                Forms\Components\Section::make('Color Customization')
+                    ->description('Personalize your QR code with custom colors and gradients.')
+                    ->icon('heroicon-o-swatch')
+                    ->schema([
+                        Forms\Components\Grid::make(2)->schema([
+                            Forms\Components\ColorPicker::make('background_color')
+                                ->label('Background Color')
+                                ->default('#FFFFFF')
+                                ->helperText('Base background color'),
+
+                            Forms\Components\ColorPicker::make('foreground_color')
+                                ->label('Foreground Color')
+                                ->default('#000000')
+                                ->helperText('QR code pattern color'),
+                        ]),
+
+                    ]),
+
+                Forms\Components\Section::make('QR Code Preview & Settings')
+                    ->description('Preview your customized QR code and manage settings.')
+                    ->icon('heroicon-o-eye')
+                    ->schema([
+
+                        Forms\Components\View::make('filament.qr-preview')
                             ->label('QR Code Preview')
-                            ->content(function (?QRCode $record) {
+                            ->viewData(function (?QRCode $record) {
                                 if (!$record || !$record->qr_code_path) {
-                                    return 'QR Code will be generated after saving.';
+                                    return [
+                                        'hasQrCode' => false,
+                                        'qrUrl' => null,
+                                    ];
                                 }
                                 $qrService = app(QRCodeService::class);
-                                $url = $qrService->getQRCodeUrl($record);
-                                return $url ? "<img src='{$url}' alt='QR Code' style='max-width: 200px;'>" : 'QR Code not found.';
+                                return [
+                                    'hasQrCode' => true,
+                                    'qrUrl' => $qrService->getQRCodeUrl($record),
+                                ];
                             })
-                            ->visible(fn (?QRCode $record) => $record && $record->exists),
+                            ->visible(fn(?QRCode $record) => $record && $record->exists)
+                            ->columnSpanFull(),
+
+                        Forms\Components\TextInput::make('encoding')
+                            ->label('Character Encoding')
+                            ->default('UTF-8')
+                            ->helperText('Character encoding for the QR code data')
+                            ->columnSpanFull(),
                     ])->columns(1),
             ]);
     }
@@ -113,13 +169,6 @@ class QRCodeResource extends Resource
                     ->disk('public')
                     ->size(60)
                     ->visibility('public'),
-                Tables\Columns\IconColumn::make('is_active')
-                    ->label('Status')
-                    ->boolean()
-                    ->trueIcon('heroicon-o-check-circle')
-                    ->falseIcon('heroicon-o-x-circle')
-                    ->trueColor('success')
-                    ->falseColor('danger'),
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Created')
                     ->dateTime()
@@ -143,7 +192,7 @@ class QRCodeResource extends Resource
                             $qrService = app(QRCodeService::class);
                             return $qrService->downloadQRCode($record);
                         })
-                        ->visible(fn (QRCode $record) => $record->qr_code_path !== null),
+                        ->visible(fn(QRCode $record) => $record->qr_code_path !== null),
                     Tables\Actions\Action::make('regenerate')
                         ->label('Regenerate QR')
                         ->icon('heroicon-o-arrow-path')
@@ -155,15 +204,6 @@ class QRCodeResource extends Resource
                             $qrService = app(QRCodeService::class);
                             $qrService->regenerateQRCode($record);
                         }),
-                    Tables\Actions\Action::make('toggle_status')
-                        ->label(fn (QRCode $record) => $record->is_active ? 'Deactivate' : 'Activate')
-                        ->icon(fn (QRCode $record) => $record->is_active ? 'heroicon-o-pause' : 'heroicon-o-play')
-                        ->color(fn (QRCode $record) => $record->is_active ? 'warning' : 'success')
-                        ->requiresConfirmation()
-                        ->modalHeading(fn (QRCode $record) => ($record->is_active ? 'Deactivate' : 'Activate') . ' QR Code')
-                        ->modalDescription(fn (QRCode $record) => 'Are you sure you want to ' . ($record->is_active ? 'deactivate' : 'activate') . ' this QR code?')
-                        ->action(fn (QRCode $record) => $record->update(['is_active' => !$record->is_active])),
-                    Tables\Actions\EditAction::make(),
                     Tables\Actions\DeleteAction::make(),
                 ]),
             ])
@@ -174,12 +214,7 @@ class QRCodeResource extends Resource
                         ->label('Activate Selected')
                         ->icon('heroicon-o-check-circle')
                         ->color('success')
-                        ->action(fn ($records) => $records->each(fn ($record) => $record->update(['is_active' => true]))),
-                    Tables\Actions\BulkAction::make('deactivate')
-                        ->label('Deactivate Selected')
-                        ->icon('heroicon-o-x-circle')
-                        ->color('warning')
-                        ->action(fn ($records) => $records->each(fn ($record) => $record->update(['is_active' => false]))),
+                        ->action(fn($records) => $records->each(fn($record) => $record->update(['is_active' => true]))),
                 ]),
             ]);
     }

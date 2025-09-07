@@ -16,6 +16,29 @@ class QRCode extends Model
         'vcard_data',
         'qr_code_path',
         'is_active',
+        // Design customization
+        'size',
+        'margin',
+        'style',
+        'eye_style',
+        // Color customization
+        'background_color',
+        'foreground_color',
+        'eye_color',
+        'gradient_enabled',
+        'gradient_start_color',
+        'gradient_end_color',
+        'gradient_type',
+        // Logo customization
+        'logo_path',
+        'logo_size',
+        'logo_position',
+        'logo_background',
+        'logo_background_color',
+        // Advanced options
+        'error_correction',
+        'encoding',
+        'custom_options',
     ];
     
     protected $attributes = [
@@ -25,6 +48,12 @@ class QRCode extends Model
 
     protected $casts = [
         'is_active' => 'boolean',
+        'gradient_enabled' => 'boolean',
+        'logo_background' => 'boolean',
+        'custom_options' => 'array',
+        'size' => 'integer',
+        'margin' => 'integer',
+        'logo_size' => 'integer',
     ];
 
     #[Scope]
