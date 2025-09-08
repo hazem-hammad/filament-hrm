@@ -132,8 +132,8 @@ class EmployeeImport implements
     {
         return [
             'name' => trim($row['name'] ?? ''),
-            'email' => strtolower(trim($row['email'] ?? '')),
-            'personal_email' => strtolower(trim($row['personal_email'] ?? '')),
+            'email' => !empty(trim($row['email'] ?? '')) ? strtolower(trim($row['email'])) : null,
+            'personal_email' => !empty(trim($row['personal_email'] ?? '')) ? strtolower(trim($row['personal_email'])) : null,
             'phone' => trim(strval($row['phone'] ?? '')), // Convert to string to handle numeric phones
             'business_phone' => trim(strval($row['business_phone'] ?? '')),
             'gender' => strtolower(trim($row['gender'] ?? '')),
