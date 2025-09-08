@@ -243,7 +243,6 @@ class RequestResource extends Resource
                                     ->placeholder('Select start date...')
                                     ->required()
                                     ->live()
-                                    ->minDate(now()->addDay())
                                     ->afterStateUpdated(function ($state, $get, $set) {
                                         if ($state && $get('end_date')) {
                                             $start = \Carbon\Carbon::parse($state);
@@ -292,8 +291,6 @@ class RequestResource extends Resource
                             ->label('Request Date')
                             ->placeholder('Select date...')
                             ->required()
-                            ->minDate(now())
-                            ->maxDate(now()->addMonths(3))
                             ->columnSpanFull()
                             ->helperText('Select the date for your attendance adjustment'),
 
@@ -304,25 +301,38 @@ class RequestResource extends Resource
                                     ->placeholder('Select start time...')
                                     ->required()
                                     ->seconds(false)
-                                    ->helperText('When you start work'),
+                                    ->live()
+                                    ->afterStateUpdated(function ($state, $get, $set) {
+                                        if ($state && $get('end_time')) {
+                                            $start = \Carbon\Carbon::parse($state);
+                                            $end = \Carbon\Carbon::parse($get('end_time'));
+                                            if ($end->lte($start)) {
+                                                $set('hours', null);
+                                                return;
+                                            }
+                                            $hours = $end->diffInHours($start, true);
+                                            $set('hours', number_format($hours, 2));
+                                        }
+                                    }),
 
                                 Forms\Components\TimePicker::make('end_time')
                                     ->label('End Time')
                                     ->placeholder('Select end time...')
                                     ->required()
                                     ->seconds(false)
+                                    ->live()
                                     ->afterStateUpdated(function ($state, $get, $set) {
                                         if ($state && $get('start_time')) {
                                             $start = \Carbon\Carbon::parse($get('start_time'));
                                             $end = \Carbon\Carbon::parse($state);
                                             if ($end->lte($start)) {
-                                                return; // Don't update if end time is before start time
+                                                $set('hours', null);
+                                                return;
                                             }
                                             $hours = $end->diffInHours($start, true);
                                             $set('hours', number_format($hours, 2));
                                         }
-                                    })
-                                    ->helperText('When you end work'),
+                                    }),
 
                                 Forms\Components\TextInput::make('hours')
                                     ->label('Total Hours')
@@ -364,7 +374,6 @@ class RequestResource extends Resource
                         Forms\Components\Textarea::make('reason')
                             ->label('Reason for Request')
                             ->placeholder('Please provide a detailed explanation for your request...')
-                            ->required()
                             ->rows(4)
                             ->columnSpanFull()
                             ->helperText('Be specific about why you need this time off or schedule adjustment'),
@@ -430,9 +439,7 @@ class RequestResource extends Resource
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('requestable.name')
-                    ->label('Category')
-                    ->sortable()
-                    ->searchable(),
+                    ->label('Category'),
 
                 Tables\Columns\TextColumn::make('start_date')
                     ->label('Start Date')
