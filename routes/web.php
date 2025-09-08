@@ -39,9 +39,3 @@ Route::post('/careers/{slug}/apply', [CareerController::class, 'apply'])
 Route::middleware(['auth:employee'])->group(function () {
     Route::get('/employee/attendance/duration', [App\Http\Controllers\Api\V1\Employee\AttendanceController::class, 'getDuration']);
 });
-
-// Admin routes for employee management
-// Route::prefix('admin')->middleware(['auth:web'])->group(function () {
-Route::get('/employees/send-welcome-emails', [AdminEmployeeController::class, 'sendWelcomeEmails'])
-    ->name('admin.employees.send-welcome-emails');
-// });

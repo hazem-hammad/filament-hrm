@@ -9,6 +9,7 @@ use App\Enum\SocialInsuranceStatus;
 use App\Filament\Resources\EmployeeResource;
 use App\Imports\EmployeeImport;
 use App\Models\Employee;
+use App\Notifications\EmployeeWelcomeNotification;
 use Filament\Actions;
 use Filament\Forms\Components\FileUpload;
 use Filament\Notifications\Notification;
@@ -16,6 +17,9 @@ use Filament\Resources\Pages\ListRecords;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 use Maatwebsite\Excel\Facades\Excel;
 
 class ListEmployees extends ListRecords
@@ -74,7 +78,7 @@ class ListEmployees extends ListRecords
                     ->label('Marital Status')
                     ->formatStateUsing(fn(MaritalStatus $state): string => $state->label())
                     ->badge()
-                    ->color(fn(MaritalStatus $state): string => match($state) {
+                    ->color(fn(MaritalStatus $state): string => match ($state) {
                         MaritalStatus::SINGLE => 'gray',
                         MaritalStatus::MARRIED => 'success',
                     })
@@ -95,7 +99,7 @@ class ListEmployees extends ListRecords
                     ->label('Contract Type')
                     ->formatStateUsing(fn(ContractType $state): string => $state->label())
                     ->badge()
-                    ->color(fn(ContractType $state): string => match($state) {
+                    ->color(fn(ContractType $state): string => match ($state) {
                         ContractType::PERMANENT => 'success',
                         ContractType::FULLTIME => 'info',
                         ContractType::PARTTIME => 'warning',
@@ -109,7 +113,7 @@ class ListEmployees extends ListRecords
                     ->label('Social Insurance')
                     ->formatStateUsing(fn(SocialInsuranceStatus $state): string => $state->getLabel())
                     ->badge()
-                    ->color(fn(SocialInsuranceStatus $state): string => match($state) {
+                    ->color(fn(SocialInsuranceStatus $state): string => match ($state) {
                         SocialInsuranceStatus::NOT_APPLICABLE => 'gray',
                         SocialInsuranceStatus::PENDING => 'warning',
                         SocialInsuranceStatus::DONE => 'success',
@@ -259,6 +263,57 @@ class ListEmployees extends ListRecords
                 Tables\Actions\ActionGroup::make([
                     Tables\Actions\ViewAction::make(),
                     Tables\Actions\EditAction::make(),
+                    Tables\Actions\Action::make('resend_welcome_email')
+                        ->label('Resend Welcome Email')
+                        ->icon('heroicon-o-envelope')
+                        ->color('info')
+                        ->requiresConfirmation()
+                        ->modalDescription(
+                            fn(Employee $record): string =>
+                            "A new welcome email with login credentials will be sent to {$record->email}. This will also generate a new password for the employee."
+                        )
+                        ->modalSubmitActionLabel('Send Email')
+                        ->action(function (Employee $record): void {
+                            try {
+                                // Generate a new temporary password
+                                $temporaryPassword = Str::password(12, true, true, true, false);
+                                $passwordSetupToken = Str::random(64);
+
+                                // Update employee's password in database
+                                $record->update([
+                                    'password' => Hash::make($temporaryPassword)
+                                ]);
+
+                                // Send welcome email
+                                $record->notify(new EmployeeWelcomeNotification($temporaryPassword, $passwordSetupToken));
+
+                                Log::info('Welcome email resent', [
+                                    'employee_id' => $record->employee_id,
+                                    'email' => $record->email,
+                                    'admin_action' => true,
+                                    'admin_user' => auth()->user()?->name ?? 'Unknown'
+                                ]);
+
+                                Notification::make()
+                                    ->title('Welcome email sent successfully')
+                                    ->body("A welcome email with new login credentials has been sent to {$record->email}")
+                                    ->success()
+                                    ->send();
+                            } catch (\Exception $e) {
+                                Log::error('Failed to resend welcome email', [
+                                    'employee_id' => $record->employee_id,
+                                    'email' => $record->email,
+                                    'error' => $e->getMessage(),
+                                    'admin_user' => auth()->user()?->name ?? 'Unknown'
+                                ]);
+
+                                Notification::make()
+                                    ->title('Failed to send welcome email')
+                                    ->body('An error occurred while sending the welcome email. Please try again.')
+                                    ->danger()
+                                    ->send();
+                            }
+                        }),
                     Tables\Actions\Action::make('toggle_status')
                         ->label(fn(Employee $record): string => $record->status ? 'Deactivate' : 'Activate')
                         ->icon(fn(Employee $record): string => $record->status ? 'heroicon-o-x-circle' : 'heroicon-o-check-circle')
@@ -405,7 +460,7 @@ class ListEmployees extends ListRecords
                 ->action(function (array $data): void {
                     // Get the uploaded file path
                     $uploadedFile = $data['file'];
-                    
+
                     // Try multiple possible paths
                     $possiblePaths = [
                         storage_path('app/' . $uploadedFile),                    // storage/app/imports/file.xlsx
@@ -414,7 +469,7 @@ class ListEmployees extends ListRecords
                         storage_path('app/livewire-tmp/' . basename($uploadedFile)), // Just filename in livewire-tmp
                         $uploadedFile,                                           // Direct path if absolute
                     ];
-                    
+
                     $filePath = null;
                     foreach ($possiblePaths as $path) {
                         if (file_exists($path)) {
@@ -422,7 +477,7 @@ class ListEmployees extends ListRecords
                             break;
                         }
                     }
-                    
+
                     if (!$filePath) {
                         // Debug: List what's actually in the directories
                         $debugInfo = [];
@@ -432,14 +487,14 @@ class ListEmployees extends ListRecords
                             'storage/app/public' => storage_path('app/public'),
                             'storage/app/livewire-tmp' => storage_path('app/livewire-tmp'),
                         ];
-                        
+
                         foreach ($debugDirs as $label => $dir) {
                             if (is_dir($dir)) {
                                 $files = array_slice(scandir($dir), 2, 5); // Skip . and .., take first 5
                                 $debugInfo[] = $label . ': ' . implode(', ', $files);
                             }
                         }
-                        
+
                         Notification::make()
                             ->title('Import Failed')
                             ->body('File not found. Searched: ' . $uploadedFile . '. Found in dirs: ' . implode(' | ', $debugInfo))
@@ -470,7 +525,7 @@ class ListEmployees extends ListRecords
                                 ->warning()
                                 ->send();
                         }
-                        
+
                         if ($importedCount === 0 && empty($errors)) {
                             Notification::make()
                                 ->title('Import Warning')
