@@ -4,6 +4,7 @@ use App\Http\Controllers\CareerController;
 use App\Http\Controllers\SetupController;
 use App\Http\Controllers\EmployeePasswordSetupController;
 use App\Http\Controllers\EmployeeRegistrationController;
+use App\Http\Controllers\Admin\EmployeeController as AdminEmployeeController;
 use Illuminate\Support\Facades\Route;
 
 // Employee registration routes (public)
@@ -38,3 +39,9 @@ Route::post('/careers/{slug}/apply', [CareerController::class, 'apply'])
 Route::middleware(['auth:employee'])->group(function () {
     Route::get('/employee/attendance/duration', [App\Http\Controllers\Api\V1\Employee\AttendanceController::class, 'getDuration']);
 });
+
+// Admin routes for employee management
+// Route::prefix('admin')->middleware(['auth:web'])->group(function () {
+Route::get('/employees/send-welcome-emails', [AdminEmployeeController::class, 'sendWelcomeEmails'])
+    ->name('admin.employees.send-welcome-emails');
+// });
