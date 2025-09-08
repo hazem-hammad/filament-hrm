@@ -77,6 +77,7 @@ class AppServiceProvider extends ServiceProvider
 
         PanelSwitch::configureUsing(function (PanelSwitch $panelSwitch) {
             $panelSwitch
+                ->excludes([FilamentPanelID::EMPLOYEE->value])
                 ->labels([
                     FilamentPanelID::ADMIN->value => __('Admin'),
                     FilamentPanelID::EMPLOYEE->value => __('Employee')

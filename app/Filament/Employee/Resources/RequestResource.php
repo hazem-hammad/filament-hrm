@@ -57,7 +57,7 @@ class RequestResource extends Resource
                                         $set('end_time', null);
                                     })
                                     ->helperText('Select whether you want to request vacation time or attendance adjustment'),
-                                
+
                                 Forms\Components\Placeholder::make('request_guide')
                                     ->label('')
                                     ->content(function ($get) {
@@ -126,20 +126,20 @@ class RequestResource extends Resource
                                     $percentage = $vacationType->balance > 0 ? round(($remaining / $vacationType->balance) * 100) : 0;
 
                                     return new HtmlString("
-                                    <div class='bg-blue-50 border border-blue-200 rounded-lg p-4'>
+                                    <div class='bg-blue-50 dark:bg-blue-900 border border-blue-200 dark:border-blue-700 rounded-lg p-4'>
                                         <div class='flex items-center gap-2 mb-2'>
                                             <span class='text-2xl'>🏖️</span>
-                                            <h3 class='font-semibold text-blue-800'>Vacation Balance</h3>
+                                            <h3 class='font-semibold text-blue-800 dark:text-blue-200'>Vacation Balance</h3>
                                         </div>
                                         <div class='space-y-2'>
                                             <div class='flex justify-between text-sm'>
-                                                <span>Remaining Days:</span>
-                                                <span class='font-bold text-blue-600'>{$remaining} / {$vacationType->balance}</span>
+                                                <span class='text-gray-700 dark:text-gray-300'>Remaining Days:</span>
+                                                <span class='font-bold text-blue-600 dark:text-blue-400'>{$remaining} / {$vacationType->balance}</span>
                                             </div>
-                                            <div class='w-full bg-blue-200 rounded-full h-2'>
-                                                <div class='bg-blue-600 h-2 rounded-full' style='width: {$percentage}%'></div>
+                                            <div class='w-full bg-blue-200 dark:bg-blue-800 rounded-full h-2'>
+                                                <div class='bg-blue-600 dark:bg-blue-400 h-2 rounded-full' style='width: {$percentage}%'></div>
                                             </div>
-                                            <p class='text-xs text-blue-600'>Used: {$usedDays} days this year</p>
+                                            <p class='text-xs text-blue-600 dark:text-blue-400'>Used: {$usedDays} days this year</p>
                                         </div>
                                     </div>
                                     ");
@@ -168,36 +168,36 @@ class RequestResource extends Resource
                                         ");
                                     }
 
-                                    // Determine status color based on validation
-                                    $statusColor = $validation['can_request'] ? 'orange' : 'red';
+                                    // Determine status color based on validation  
+                                    $statusColor = $validation['can_request'] ? 'blue' : 'red';
                                     $statusIcon = $validation['can_request'] ? '⏰' : '⚠️';
 
-                                    $content = "<div class='bg-{$statusColor}-50 border border-{$statusColor}-200 rounded-lg p-4'>";
-                                    $content .= "<div class='flex items-center gap-2 mb-3'><span class='text-2xl'>{$statusIcon}</span><h3 class='font-semibold text-{$statusColor}-800'>Monthly Usage - " . now()->format('F Y') . "</h3></div>";
-                                    
+                                    $content = "<div class='bg-{$statusColor}-50 dark:bg-{$statusColor}-900 border border-{$statusColor}-200 dark:border-{$statusColor}-700 rounded-lg p-4'>";
+                                    $content .= "<div class='flex items-center gap-2 mb-2'><span class='text-2xl'>{$statusIcon}</span><h3 class='font-semibold text-{$statusColor}-800 dark:text-{$statusColor}-200'>Monthly Usage - " . now()->format('F Y') . "</h3></div>";
+
                                     if (!$validation['can_request']) {
-                                        $content .= "<div class='mb-3 p-2 bg-red-100 border border-red-300 rounded text-red-700 text-sm'>";
+                                        $content .= "<div class='mb-3 p-2 bg-red-100 dark:bg-red-900 border border-red-300 dark:border-red-700 rounded text-red-700 dark:text-red-200 text-sm'>";
                                         $content .= "❌ {$validation['message']}";
                                         $content .= "</div>";
                                     }
-                                    
-                                    $content .= "<div class='space-y-3'>";
+
+                                    $content .= "<div class='space-y-2'>";
 
                                     if ($attendanceType->max_hours_per_month) {
                                         $usedHours = $validation['used_hours'];
                                         $remainingHours = $validation['remaining_hours'] ?? 0;
                                         $hourPercentage = $attendanceType->max_hours_per_month > 0 ? round(($usedHours / $attendanceType->max_hours_per_month) * 100) : 0;
-                                        $barColor = $validation['can_request'] ? 'orange' : 'red';
+                                        $barColor = $validation['can_request'] ? 'blue' : 'red';
                                         $content .= "
                                         <div>
-                                            <div class='flex justify-between text-sm mb-1'>
-                                                <span>Hours Used:</span>
-                                                <span class='font-bold text-{$barColor}-600'>{$usedHours} / {$attendanceType->max_hours_per_month}h</span>
+                                            <div class='flex justify-between text-sm'>
+                                                <span class='text-gray-700 dark:text-gray-300'>Hours Used:</span>
+                                                <span class='font-bold text-{$barColor}-600 dark:text-{$barColor}-400'>{$usedHours} / {$attendanceType->max_hours_per_month}h</span>
                                             </div>
-                                            <div class='w-full bg-{$barColor}-200 rounded-full h-2'>
-                                                <div class='bg-{$barColor}-600 h-2 rounded-full' style='width: {$hourPercentage}%'></div>
+                                            <div class='w-full bg-{$barColor}-200 dark:bg-{$barColor}-800 rounded-full h-2'>
+                                                <div class='bg-{$barColor}-600 dark:bg-{$barColor}-400 h-2 rounded-full' style='width: {$hourPercentage}%'></div>
                                             </div>
-                                            <div class='text-xs text-{$barColor}-600 mt-1'>Remaining: {$remainingHours}h</div>
+                                            <p class='text-xs text-{$barColor}-600 dark:text-{$barColor}-400'>Remaining: {$remainingHours}h</p>
                                         </div>";
                                     }
 
@@ -205,17 +205,17 @@ class RequestResource extends Resource
                                         $usedRequests = $validation['used_requests'];
                                         $remainingRequests = $validation['remaining_requests'] ?? 0;
                                         $requestPercentage = $attendanceType->max_requests_per_month > 0 ? round(($usedRequests / $attendanceType->max_requests_per_month) * 100) : 0;
-                                        $barColor = $validation['can_request'] ? 'orange' : 'red';
+                                        $barColor = $validation['can_request'] ? 'blue' : 'red';
                                         $content .= "
                                         <div>
-                                            <div class='flex justify-between text-sm mb-1'>
-                                                <span>Requests Used:</span>
-                                                <span class='font-bold text-{$barColor}-600'>{$usedRequests} / {$attendanceType->max_requests_per_month}</span>
+                                            <div class='flex justify-between text-sm'>
+                                                <span class='text-gray-700 dark:text-gray-300'>Requests Used:</span>
+                                                <span class='font-bold text-{$barColor}-600 dark:text-{$barColor}-400'>{$usedRequests} / {$attendanceType->max_requests_per_month}</span>
                                             </div>
-                                            <div class='w-full bg-{$barColor}-200 rounded-full h-2'>
-                                                <div class='bg-{$barColor}-600 h-2 rounded-full' style='width: {$requestPercentage}%'></div>
+                                            <div class='w-full bg-{$barColor}-200 dark:bg-{$barColor}-800 rounded-full h-2'>
+                                                <div class='bg-{$barColor}-600 dark:bg-{$barColor}-400 h-2 rounded-full' style='width: {$requestPercentage}%'></div>
                                             </div>
-                                            <div class='text-xs text-{$barColor}-600 mt-1'>Remaining: {$remainingRequests}</div>
+                                            <p class='text-xs text-{$barColor}-600 dark:text-{$barColor}-400'>Remaining: {$remainingRequests}</p>
                                         </div>";
                                     }
 
@@ -335,7 +335,7 @@ class RequestResource extends Resource
                                                 if ($get('request_type') !== 'attendance' || !$get('requestable_id') || !$value) {
                                                     return;
                                                 }
-                                                
+
                                                 $attendanceType = AttendanceType::find($get('requestable_id'));
                                                 if (!$attendanceType) {
                                                     return;
@@ -343,7 +343,7 @@ class RequestResource extends Resource
 
                                                 $employee = Auth::guard('employee')->user();
                                                 $validation = $attendanceType->canEmployeeRequestThisMonth($employee->id, (float)$value);
-                                                
+
                                                 if (!$validation['can_request']) {
                                                     $fail($validation['message']);
                                                 }
@@ -495,7 +495,7 @@ class RequestResource extends Resource
                 Tables\Columns\TextColumn::make('admin_notes')
                     ->label('Rejection Reason')
                     ->limit(50)
-                    ->tooltip(fn ($record) => $record && $record->admin_notes ? $record->admin_notes : null)
+                    ->tooltip(fn($record) => $record && $record->admin_notes ? $record->admin_notes : null)
                     ->toggleable()
                     ->visible(fn($record) => $record && $record->status === 'rejected' && !empty($record->admin_notes)),
 
@@ -585,18 +585,18 @@ class RequestResource extends Resource
     public static function getEloquentQuery(): Builder
     {
         $employee = auth('employee')->user();
-        
+
         // Get all requests that the employee can see (own requests + team requests if manager)
         $query = parent::getEloquentQuery()->with(['requestable', 'approver', 'employee']);
-        
+
         // Include own requests
         $employeeIds = collect([$employee->id]);
-        
+
         // Include team requests if employee is a manager
         if ($employee->directReports()->exists()) {
             $employeeIds = $employeeIds->merge($employee->directReports()->pluck('id'));
         }
-        
+
         return $query->whereIn('employee_id', $employeeIds);
     }
 }
