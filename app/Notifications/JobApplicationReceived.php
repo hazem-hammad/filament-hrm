@@ -4,13 +4,10 @@ namespace App\Notifications;
 
 use App\Mail\JobApplicationReceivedMail;
 use App\Models\JobApplication;
-use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Notification;
 
-class JobApplicationReceived extends Notification implements ShouldQueue
+class JobApplicationReceived extends Notification
 {
-    use Queueable;
 
     public function __construct(
         private JobApplication $jobApplication

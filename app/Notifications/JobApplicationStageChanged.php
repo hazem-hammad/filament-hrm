@@ -5,13 +5,10 @@ namespace App\Notifications;
 use App\Mail\JobStageUpdateMail;
 use App\Models\JobApplication;
 use App\Models\JobStage;
-use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Notification;
 
-class JobApplicationStageChanged extends Notification implements ShouldQueue
+class JobApplicationStageChanged extends Notification
 {
-    use Queueable;
 
     public function __construct(
         private JobApplication $jobApplication,

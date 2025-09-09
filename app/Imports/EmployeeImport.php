@@ -380,10 +380,10 @@ class EmployeeImport implements
 
                 // Only send welcome email if employee has email
                 if ($employee->email) {
-                    // Send welcome email with password. Use sendNow to avoid requiring a running queue worker
+                    // Send welcome email with password immediately
                     // For the existing notification, we need a password setup token as well
                     $passwordSetupToken = \Illuminate\Support\Str::random(64);
-                    Notification::sendNow($employee, new EmployeeWelcomeNotification($password, $passwordSetupToken));
+                    $employee->notify(new EmployeeWelcomeNotification($password, $passwordSetupToken));
 
                     Log::info('Welcome email sent', [
                         'employee_id' => $employee->employee_id,
