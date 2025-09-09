@@ -237,17 +237,6 @@
 
         <!-- Content -->
         <div class="content">
-            <!-- Job Details Card -->
-            <div class="job-details">
-                <div class="job-info">Position Applied For</div>
-                <div class="job-title">{{ $jobApplication->job->title }}</div>
-            </div>
-
-            <!-- Status Update Card -->
-            <div class="status-card">
-                <div class="status-label">Current Stage</div>
-                <div class="status-value">{{ $newStage->name }}</div>
-            </div>
 
             @if ($customContent)
                 <div class="custom-content">

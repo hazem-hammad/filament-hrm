@@ -389,20 +389,6 @@ class RequestResource extends Resource
                             ->helperText('Optional: Upload medical certificates, travel documents, or other supporting files (Max 5 files, 5MB each)')
                             ->visible(fn($get) => $get('request_type') === 'vacation'),
 
-                        // Manager Selection for Escalation
-                        Forms\Components\Select::make('escalate_to')
-                            ->label('Escalate to Manager (Optional)')
-                            ->placeholder('Select manager for escalation...')
-                            ->options(function () {
-                                $employee = auth('employee')->user();
-                                return \App\Models\Employee::where('id', '!=', $employee->id)
-                                    ->whereHas('directReports')
-                                    ->pluck('name', 'id');
-                            })
-                            ->searchable()
-                            ->columnSpanFull()
-                            ->helperText('Select a different manager if your direct manager is unavailable')
-                            ->visible(fn($get) => !empty($get('reason'))),
                     ])
                     ->columnSpan(2),
 
