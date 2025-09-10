@@ -29,7 +29,7 @@ class EmployeeWelcomeNotification extends Notification
     {
         return (new MailMessage)
             ->subject('🎉 Welcome to ' . config('app.name') . ' - Your Journey Begins!')
-            ->from(config('mail.from.address'), get_setting('app_name', 'HRM System'))
+            ->from(config('mail.from.address'), get_setting('company_name', 'HRM System'))
             ->view('emails.employee-welcome', [
                 'employee' => $notifiable,
                 'temporaryPassword' => $this->temporaryPassword,

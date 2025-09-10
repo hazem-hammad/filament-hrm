@@ -1,12 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registration Successful - {{ get_setting('app_name', 'HRM System') }}</title>
+    <title>Registration Successful - {{ get_setting('company_name', 'HRM System') }}</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
+
 <body class="bg-gray-50 min-h-screen flex items-center justify-center py-8">
     <div class="max-w-md mx-auto px-4 sm:px-6 lg:px-8">
         <div class="bg-white shadow-lg rounded-lg overflow-hidden">
@@ -15,11 +17,12 @@
                 <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100 mb-4">
                     <i class="fas fa-check text-green-600 text-2xl"></i>
                 </div>
-                
+
                 <!-- Success Message -->
                 <h1 class="text-2xl font-bold text-gray-900 mb-2">Registration Successful!</h1>
                 <p class="text-gray-600 mb-6">
-                    Welcome to {{ get_setting('app_name', 'HRM System') }}! Your employee registration has been completed successfully.
+                    Welcome to {{ get_setting('company_name', 'HRM System') }}! Your employee registration has been
+                    completed successfully.
                 </p>
 
                 <!-- Next Steps -->
@@ -50,8 +53,8 @@
                 </div>
 
                 <!-- Action Button -->
-                <a href="/" 
-                   class="inline-flex items-center px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg shadow-lg transition duration-300 ease-in-out transform hover:scale-105">
+                <a href="/"
+                    class="inline-flex items-center px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg shadow-lg transition duration-300 ease-in-out transform hover:scale-105">
                     <i class="fas fa-home mr-2"></i>
                     Back to Home
                 </a>
@@ -60,8 +63,9 @@
 
         <!-- Footer -->
         <div class="text-center mt-8 text-gray-500 text-sm">
-            <p>&copy; {{ date('Y') }} {{ get_setting('app_name', 'HRM System') }}. All rights reserved.</p>
+            <p>&copy; {{ date('Y') }} {{ get_setting('company_name', 'HRM System') }}. All rights reserved.</p>
         </div>
     </div>
 </body>
+
 </html>
