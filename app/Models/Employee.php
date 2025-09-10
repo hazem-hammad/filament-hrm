@@ -126,8 +126,7 @@ class Employee extends Authenticatable implements HasMedia, HasAvatar
         $this->addMediaConversion('thumb')
             ->width(150)
             ->height(150)
-            ->sharpen(10)
-            ->onlyFor(['image/jpeg', 'image/jpg', 'image/png']);
+            ->sharpen(10);
     }
 
     protected static function boot()

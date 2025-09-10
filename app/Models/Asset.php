@@ -89,8 +89,7 @@ class Asset extends Model implements HasMedia
         $this->addMediaConversion('thumb')
             ->width(300)
             ->height(300)
-            ->sharpen(10)
-            ->onlyFor(['image/jpeg', 'image/jpg', 'image/png']);
+            ->sharpen(10);
     }
 
     protected static function boot()
