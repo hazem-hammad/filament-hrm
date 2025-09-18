@@ -85,7 +85,7 @@ class NotesRelationManager extends RelationManager
                         }
 
                         // Verify user exists in database
-                        $userExists = \App\Models\User::where('id', $userId)->exists();
+                        $userExists = \App\Models\Admin::where('id', $userId)->exists();
                         if (!$userExists) {
                             throw new \Exception('Authenticated user not found in database. Please contact administrator.');
                         }
