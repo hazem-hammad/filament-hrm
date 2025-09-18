@@ -9,8 +9,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('job_openings', function (Blueprint $table) {
-            // add slug after title (adjust column name if your title column differs)
-            $table->string('slug')->unique()->after('title')->nullable();
+            // Check if slug column doesn't exist before adding
+            if (!Schema::hasColumn('job_openings', 'slug')) {
+                $table->string('slug')->unique()->after('title')->nullable();
+            }
         });
     }
 

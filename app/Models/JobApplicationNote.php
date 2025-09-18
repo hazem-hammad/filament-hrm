@@ -30,7 +30,7 @@ class JobApplicationNote extends Model implements HasMedia
 
     public function user(): BelongsTo
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(Admin::class);
     }
 
     public function registerMediaCollections(): void
